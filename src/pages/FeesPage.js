@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchJson, fetchList, postJson, isAdmin } from '../api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import FeeReceipt from '../components/FeeReceipt';
+import { exportToExcel, PAYMENT_COLS } from '../utils/export';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -115,6 +117,8 @@ function FeesPage() {
   }, [payments, searchQuery]);
 
   const handleSave = async () => {
+    if (!form.student) { setError('Please select a student'); return; }
+    if (!form.amount || Number(form.amount) <= 0) { setError('Amount must be greater than 0'); return; }
     try {
       await postJson('/finance/payments/', form);
       setModal(false);
@@ -126,6 +130,7 @@ function FeesPage() {
   const updateField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const [showFilters, setShowFilters] = useState(false);
+  const [printPayment, setPrintPayment] = useState(null);
 
   return (
     <div className="animate-fade-in dashboard-shell">
@@ -134,9 +139,16 @@ function FeesPage() {
           <p className="subtitle">Finance Analysis</p>
           <h2 className="fs-1">Revenue Dashboard</h2>
         </div>
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 flex-wrap">
           <button className="btn btn-outline-primary d-lg-none rounded-pill px-4" onClick={() => setShowFilters(!showFilters)}>
             {showFilters ? '✕ Close Filters' : '🔍 Filter Data'}
+          </button>
+          <button
+            className="btn rounded-pill px-4"
+            style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem' }}
+            onClick={() => exportToExcel(filteredPayments, PAYMENT_COLS, 'fee_payments')}
+          >
+            ⬇ Export
           </button>
           {admin && (
             <button className="btn btn-premium pulse-primary" onClick={() => setModal(true)}>
@@ -264,10 +276,11 @@ function FeesPage() {
                 <thead>
                   <tr>
                     <th>Student</th>
-                    <th>Branch & Batch</th>
+                    <th>Branch &amp; Batch</th>
                     <th>Date</th>
                     <th>Mode</th>
-                    <th className="text-end">Amount</th>
+                    <th>Amount</th>
+                    <th>Receipt</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -285,11 +298,21 @@ function FeesPage() {
                       </td>
                       <td data-label="Date"><span className="small">{p.payment_date}</span></td>
                       <td data-label="Mode">
-                        <span className={`badge rounded-pill px-3 py-1 ${p.payment_mode === 'cash' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary'}`}>
+                        <span className={`badge rounded-pill px-3 py-1 ${p.payment_mode === "cash" ? "bg-success-subtle text-success" : "bg-primary-subtle text-primary"}`}>
                           {p.payment_mode.toUpperCase()}
                         </span>
                       </td>
-                      <td data-label="Amount" className="text-end fw-bold text-primary">₹{Number(p.amount).toLocaleString()}</td>
+                      <td className="fw-bold text-primary">&#8377;{Number(p.amount).toLocaleString()}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm rounded-pill px-3"
+                          style={{ border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: "0.72rem" }}
+                          onClick={() => { setPrintPayment(p); setTimeout(() => window.print(), 100); }}
+                          title="Print receipt"
+                        >
+                          Print
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -339,6 +362,9 @@ function FeesPage() {
           </div>
         </div>
       )}
+
+      {/* Fee Receipt — hidden in UI, visible during print */}
+      <FeeReceipt payment={printPayment} student={students.find(s => s.id === printPayment?.student)} />
     </div>
   );
 }

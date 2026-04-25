@@ -58,10 +58,10 @@ function DashboardPage() {
   const COLORS = ['#6366f1', '#e2e8f0'];
 
   const kpis = [
-    { label: 'Total Students', value: stats?.total_students || '0', icon: '🎓', trend: '+12%', color: 'var(--primary-soft)' },
-    { label: 'Total Teachers', value: stats?.total_teachers || '0', icon: '👩‍🏫', trend: '+2%', color: 'rgba(16, 185, 129, 0.1)' },
-    { label: 'Active Branches', value: stats?.total_branches || '0', icon: '🏢', trend: 'Stable', color: 'rgba(245, 158, 11, 0.1)' },
-    { label: 'Revenue (Total)', value: fmt(collected), icon: '💰', trend: '+8%', color: 'rgba(244, 63, 94, 0.1)' },
+    { label: 'Total Students', value: stats?.total_students ?? '—', icon: '🎓', trend: '+12%', color: 'var(--primary-soft)', trendUp: true },
+    { label: 'Total Teachers', value: stats?.total_teachers ?? '—', icon: '👩‍🏫', trend: 'Active', color: 'rgba(16, 185, 129, 0.1)', trendUp: true },
+    { label: 'Active Branches', value: stats?.total_branches ?? '—', icon: '🏢', trend: 'Stable', color: 'rgba(245, 158, 11, 0.1)', trendUp: true },
+    { label: 'Revenue Collected', value: fmt(collected), icon: '💰', trend: `${collectionRate}% rate`, color: 'rgba(244, 63, 94, 0.1)', trendUp: collectionRate >= 80 },
   ];
 
   return (
@@ -80,12 +80,12 @@ function DashboardPage() {
               <div className="stat-icon-wrapper" style={{ background: kpi.color, marginBottom: 0 }}>
                 <span>{kpi.icon}</span>
               </div>
-              <div className={`stat-trend ${kpi.trend.includes('+') ? 'trend-up' : 'trend-down'} small fw-bold`}>
+              <div className={`stat-trend ${kpi.trendUp ? 'trend-up' : 'trend-down'} small fw-bold`}>
                 {kpi.trend}
               </div>
             </div>
             <div className="mt-3">
-              <p className="text-muted small fw-bold m-0 uppercase" style={{ letterSpacing: '0.05em' }}>{kpi.label}</p>
+              <p className="small fw-bold m-0" style={{ letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{kpi.label}</p>
               <h3 className="stat-value m-0">{kpi.value}</h3>
             </div>
             <div style={{ width: '100%', height: '40px', marginTop: '1rem' }}>

@@ -20,6 +20,21 @@ function Layout() {
   // Close drawer on route change
   useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
+  // A4: Silently re-validate role from server on app load
+  useEffect(() => {
+    fetchJson('/auth/profile/').then(serverProfile => {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.role !== serverProfile.role) {
+            localStorage.setItem('user', JSON.stringify({ ...parsed, role: serverProfile.role }));
+          }
+        } catch {}
+      }
+    }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("eklavya-theme", theme);

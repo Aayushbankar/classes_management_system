@@ -53,9 +53,22 @@ class StudentViewSet(viewsets.ModelViewSet):
     def import_students(self, request):
         file_obj = request.FILES.get('file')
         if not file_obj:
-            return Response({'error': 'CSV or XLS file is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'CSV file is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        wrapper = TextIOWrapper(file_obj.file, encoding='utf-8')
+        # File size limit: 5 MB
+        MAX_SIZE = 5 * 1024 * 1024
+        if file_obj.size > MAX_SIZE:
+            return Response({'error': 'File too large. Maximum allowed size is 5 MB.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Extension check
+        if not file_obj.name.lower().endswith('.csv'):
+            return Response({'error': 'Only .csv files are accepted.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # UTF-8 encoding safety
+        try:
+            wrapper = TextIOWrapper(file_obj.file, encoding='utf-8', errors='strict')
+        except (UnicodeDecodeError, LookupError):
+            return Response({'error': 'File must be UTF-8 encoded.'}, status=status.HTTP_400_BAD_REQUEST)
         reader = csv.DictReader(wrapper)
         created, skipped = 0, 0
         errors = []
