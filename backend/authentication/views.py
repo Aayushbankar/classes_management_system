@@ -113,22 +113,34 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def register_view(request):
     """
-    Register a new user
+    Register a new user — restricted to owner/admin only.
+    Public self-registration is disabled for security.
     """
+    if not (request.user.is_superuser or request.user.role in [User.ROLE_OWNER, User.ROLE_ADMIN]):
+        return Response(
+            {'error': 'Only owners or admins can register new users.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)
+        # Force assistant role when admin creates user
+        if request.user.role == User.ROLE_ADMIN:
+            serializer.validated_data['role'] = User.ROLE_ASSISTANT
+            serializer.validated_data['branch'] = request.user.branch
 
+        user = serializer.save()
+        UserActionLog.objects.create(
+            actor=request.user,
+            target_user=user,
+            action=UserActionLog.ACTION_CREATE,
+            details=f'Registered by {request.user.username}',
+        )
         return Response(
-            {
-                'user': UserSerializer(user).data,
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-            },
+            {'user': UserSerializer(user).data, 'message': 'User created successfully.'},
             status=status.HTTP_201_CREATED
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -138,13 +150,21 @@ def register_view(request):
 @permission_classes([AllowAny])
 def login_view(request):
     """
-    Login user with username and password
-    Returns JWT tokens and user data
+    Login user with username and password.
+    Returns JWT tokens and user data.
+    Rate-limited via DRF throttling in settings.
     """
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.validated_data['user']
         refresh = RefreshToken.for_user(user)
+
+        UserActionLog.objects.create(
+            actor=user,
+            target_user=user,
+            action=UserActionLog.ACTION_LOGIN,
+            details=f'Login from {request.META.get("REMOTE_ADDR", "unknown")}',
+        )
 
         response_data = {
             'user': UserSerializer(user).data,

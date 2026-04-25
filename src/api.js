@@ -1,5 +1,8 @@
 import API_URL from './config';
 
+let isRefreshing = false;
+let refreshQueue = [];
+
 const getToken = () => localStorage.getItem('access_token');
 
 export function getAuthHeaders() {
@@ -10,8 +13,31 @@ export function getAuthHeaders() {
   };
 }
 
-function handle401(response) {
+async function handle401(response) {
   if (response.status === 401) {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (refreshToken && !isRefreshing) {
+      isRefreshing = true;
+      try {
+        const refreshResponse = await fetch(`${API_URL}/api/token/refresh/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          localStorage.setItem('access_token', data.access);
+          isRefreshing = false;
+          refreshQueue.forEach(cb => cb(data.access));
+          refreshQueue = [];
+          return 'retried';
+        }
+      } catch (e) {
+        // refresh failed
+      }
+      isRefreshing = false;
+      refreshQueue = [];
+    }
     clearSession();
     window.location.href = '/';
   }
@@ -102,4 +128,15 @@ export function isOwner() {
 export function canManageUsers() {
   const user = getCurrentUser();
   return user && (user.role === 'owner' || user.role === 'admin' || user.is_superuser);
+}
+
+/**
+ * Fetch a list endpoint that may return paginated ({results, count}) or plain array.
+ * Always returns an array.
+ */
+export async function fetchList(path, options = {}) {
+  const data = await fetchJson(path, options);
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.results)) return data.results;
+  return [];
 }

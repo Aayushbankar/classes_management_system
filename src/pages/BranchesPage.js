@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson, postJson, putJson, deleteJson, isAdmin } from '../api';
+import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 
 const emptyBranch = { name: '', code: '', address: '', city: '', is_active: true };
 
@@ -11,7 +11,7 @@ function BranchesPage() {
   const [editId, setEditId] = useState(null);
   const admin = isAdmin();
 
-  const load = () => fetchJson('/branches/').then(setBranches).catch(e => setError(e.message));
+  const load = () => fetchList('/branches/').then(setBranches).catch(e => setError(e.message));
   useEffect(() => { load(); }, []);
 
   const openAdd = () => { setForm(emptyBranch); setEditId(null); setModal('add'); };

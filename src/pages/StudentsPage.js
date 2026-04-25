@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchJson, postJson, putJson, deleteJson, isAdmin } from '../api';
+import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 
 const emptyStudent = { name: '', parent_name: '', contact_number: '', standard: '', batch_time: '', roll_number: '', branch: '', decided_fee: '0', paid_fee: '0', status: 'active' };
 
@@ -22,11 +22,11 @@ function StudentsPage() {
     if (searchName) params.append('name', searchName);
     if (searchStandard) params.append('standard', searchStandard);
     if (searchBranch) params.append('branch', searchBranch);
-    fetchJson(`/students/?${params.toString()}`).then(setStudents).catch(e => setError(e.message));
+    fetchList(`/students/?${params.toString()}`).then(setStudents).catch(e => setError(e.message));
   }, [searchName, searchStandard, searchBranch]);
 
   useEffect(() => {
-    fetchJson('/branches/').then(setBranches).catch(() => {});
+    fetchList('/branches/').then(setBranches).catch(() => {});
   }, []);
 
   useEffect(() => {

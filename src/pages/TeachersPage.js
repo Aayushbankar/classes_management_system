@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson, postJson, putJson, deleteJson, isAdmin } from '../api';
+import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 
 const emptyTeacher = { name: '', email: '', phone: '', subject: '', assigned_standard: '', branch: '' };
 
@@ -13,8 +13,8 @@ function TeachersPage() {
   const admin = isAdmin();
 
   const load = () => {
-    fetchJson('/teachers/').then(setTeachers).catch(e => setError(e.message));
-    fetchJson('/branches/').then(setBranches).catch(() => {});
+    fetchList('/teachers/').then(setTeachers).catch(e => setError(e.message));
+    fetchList('/branches/').then(setBranches).catch(() => {});
   };
   useEffect(() => { load(); }, []);
 

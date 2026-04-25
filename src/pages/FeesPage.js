@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchJson, postJson, isAdmin } from '../api';
+import { fetchJson, fetchList, postJson, isAdmin } from '../api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -60,7 +60,7 @@ function FeesPage() {
     if (filterStandard && filterStandard !== 'All Classes') query += `standard=${filterStandard}&`;
     if (filterBatch) query += `batch=${encodeURIComponent(filterBatch)}&`;
     
-    fetchJson(`/finance/payments/${query}`)
+    fetchList(`/finance/payments/${query}`)
       .then(data => setPayments(sortPayments(data)))
       .catch(e => setError(e.message));
 
@@ -68,8 +68,8 @@ function FeesPage() {
       .then(setFeesData)
       .catch(() => {});
 
-    fetchJson('/students/').then(setStudents).catch(() => {});
-    fetchJson('/branches/').then(setBranches).catch(() => {});
+    fetchList('/students/').then(setStudents).catch(() => {});
+    fetchList('/branches/').then(setBranches).catch(() => {});
   };
 
   useEffect(() => { load(); }, [filterBranch, filterStandard, filterBatch]);
