@@ -10,11 +10,15 @@ function Layout() {
   const [isSearching, setIsSearching] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [theme, setTheme] = useState(() => localStorage.getItem("eklavya-theme") || "default");
+  const [drawerOpen, setDrawerOpen] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
   const commandInputRef = useRef(null);
+
+  // Close drawer on route change
+  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -42,6 +46,14 @@ function Layout() {
     { name: "Profile", path: "profile", icon: "👤" },
   ];
 
+  const themeOptions = [
+    { value: "default", label: "Modern Azure", icon: "💎" },
+    { value: "midnight", label: "Midnight Pro", icon: "🌑" },
+    { value: "lavender", label: "Royal Velvet", icon: "🔮" },
+    { value: "sunset", label: "Crimson Sunset", icon: "🌅" },
+    { value: "emerald", label: "Emerald Forest", icon: "🌿" },
+  ];
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -50,6 +62,7 @@ function Layout() {
       }
       if (e.key === 'Escape') {
         setShowCommandPalette(false);
+        setDrawerOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -57,43 +70,44 @@ function Layout() {
   }, []);
 
   useEffect(() => {
-    if (showCommandPalette) {
-      commandInputRef.current?.focus();
-    }
+    if (showCommandPalette) commandInputRef.current?.focus();
   }, [showCommandPalette]);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setGlobalResults([]);
-      return;
-    }
-
+    if (!searchQuery.trim()) { setGlobalResults([]); return; }
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
         const data = await fetchJson(`/api/search/?q=${encodeURIComponent(searchQuery)}`);
         setGlobalResults(data.results || []);
-      } catch (e) {
-        console.error("Search failed", e);
-      } finally {
-        setIsSearching(false);
-      }
+      } catch (e) { console.error("Search failed", e); }
+      finally { setIsSearching(false); }
     }, 300);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+  useEffect(() => { loadNotifications(); }, []);
 
-  const handleLogout = () => {
-    clearSession();
-    navigate("/");
-  };
+  const handleLogout = () => { clearSession(); navigate("/"); };
 
   const filteredPages = pages.filter(page => 
     page.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Hamburger SVG icon
+  const HamburgerIcon = () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+
+  const CloseIcon = () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
   );
 
   return (
@@ -101,8 +115,8 @@ function Layout() {
       {/* Desktop Sidebar */}
       <aside className="desktop-sidebar">
         <div className="d-flex align-items-center gap-2 mb-4 px-2">
-          <div style={{ width: 32, height: 32, background: 'var(--primary-gradient)', borderRadius: '8px' }}></div>
-          <h2 className="fs-4 m-0 gradient-text">Eklavya</h2>
+          <div style={{ width: 30, height: 30, background: 'var(--primary-gradient)', borderRadius: '8px' }}></div>
+          <h2 className="fs-5 m-0 gradient-text" style={{ fontWeight: 800 }}>Eklavya</h2>
         </div>
         
         <nav className="flex-grow-1">
@@ -114,45 +128,110 @@ function Layout() {
                 to={page.path} 
                 className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
               >
-                <span className="fs-5">{page.icon}</span>
+                <span style={{ fontSize: '1.1rem' }}>{page.icon}</span>
                 {page.name}
                 {page.name === "Notifications" && unreadCount > 0 && (
-                  <Badge bg="danger" pill className="ms-auto">{unreadCount}</Badge>
+                  <Badge bg="danger" pill className="ms-auto" style={{ fontSize: '0.65rem' }}>{unreadCount}</Badge>
                 )}
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="mt-auto pt-4 border-top">
+        <div className="mt-auto pt-3" style={{ borderTop: '1px solid var(--border)' }}>
           <Form.Select 
             size="sm" 
             value={theme} 
             onChange={(e) => setTheme(e.target.value)} 
-            className="mb-3 border-0 bg-light rounded-pill px-3 fw-bold"
+            className="mb-3 rounded-pill px-3 fw-bold"
+            style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: '0.8rem' }}
           >
-            <option value="default">💎 Modern Azure</option>
-            <option value="midnight">🌑 Midnight Pro</option>
-            <option value="lavender">🔮 Royal Velvet</option>
-            <option value="sunset">🌅 Crimson Sunset</option>
-            <option value="emerald">🌿 Emerald Forest</option>
+            {themeOptions.map(t => (
+              <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+            ))}
           </Form.Select>
-          <button className="btn btn-link text-danger p-0 nav-link fw-semibold" onClick={handleLogout}>
+          <button className="btn btn-link p-0 fw-semibold" style={{ color: 'var(--danger)', fontSize: '0.85rem' }} onClick={handleLogout}>
             🚪 Sign out
           </button>
         </div>
       </aside>
 
-      {/* Mobile Header */}
+      {/* Mobile Header with Hamburger */}
       <header className="app-navbar d-flex d-lg-none align-items-center justify-content-between">
-        <h2 className="fs-5 m-0 gradient-text">Eklavya</h2>
+        <div className="d-flex align-items-center gap-2">
+          <button 
+            className="hamburger-btn" 
+            onClick={() => setDrawerOpen(!drawerOpen)}
+            aria-label="Menu"
+          >
+            {drawerOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
+          <h2 className="fs-6 m-0 gradient-text" style={{ fontWeight: 800 }}>Eklavya</h2>
+        </div>
         <div className="d-flex align-items-center gap-3">
-          <button className="btn btn-link p-0 text-dark" onClick={() => setShowCommandPalette(true)}>🔍</button>
-          <NavLink to="notifications" className="text-dark position-relative">
-            🔔 {unreadCount > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem' }}>{unreadCount}</span>}
+          <button className="hamburger-btn" onClick={() => setShowCommandPalette(true)} aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
+          <NavLink to="notifications" className="position-relative" style={{ color: 'var(--text)' }}>
+            🔔 {unreadCount > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.55rem' }}>{unreadCount}</span>}
           </NavLink>
         </div>
       </header>
+
+      {/* Mobile Slide-Out Drawer */}
+      {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
+      <div className={`mobile-drawer ${drawerOpen ? 'open' : ''}`}>
+        <div className="d-flex align-items-center gap-2 mb-4">
+          <div style={{ width: 28, height: 28, background: 'var(--primary-gradient)', borderRadius: '8px' }}></div>
+          <h2 className="fs-6 m-0 gradient-text" style={{ fontWeight: 800 }}>Eklavya</h2>
+        </div>
+
+        <nav className="drawer-nav">
+          {pages.map((page) => {
+            if (page.name === 'Users' && !canManageUsers()) return null;
+            return (
+              <NavLink 
+                key={page.path} 
+                to={page.path} 
+                className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
+                onClick={() => setDrawerOpen(false)}
+              >
+                <span style={{ fontSize: '1.1rem' }}>{page.icon}</span>
+                {page.name}
+                {page.name === "Notifications" && unreadCount > 0 && (
+                  <Badge bg="danger" pill className="ms-auto" style={{ fontSize: '0.65rem' }}>{unreadCount}</Badge>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+          <p className="filter-label mb-2">Theme</p>
+          <div className="theme-picker">
+            {themeOptions.map(t => (
+              <button 
+                key={t.value}
+                className={`theme-chip ${theme === t.value ? 'active' : ''}`}
+                onClick={() => setTheme(t.value)}
+              >
+                <span>{t.icon}</span>
+                <span>{t.label}</span>
+              </button>
+            ))}
+          </div>
+          <button 
+            className="btn btn-link p-0 mt-3 fw-semibold" 
+            style={{ color: 'var(--danger)', fontSize: '0.85rem' }} 
+            onClick={handleLogout}
+          >
+            🚪 Sign out
+          </button>
+        </div>
+      </div>
 
       <main className="main-content">
         <Outlet />
@@ -181,7 +260,7 @@ function Layout() {
               <input 
                 ref={commandInputRef}
                 type="text" 
-                placeholder="Type to search pages, students, or records..." 
+                placeholder="Search pages, students, records..." 
                 className="command-input"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
