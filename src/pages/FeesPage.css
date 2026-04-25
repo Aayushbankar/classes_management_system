@@ -1,0 +1,286 @@
+/* Power BI & Excel Styled Layout */
+
+.fees-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* KPI Cards */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 18px 30px rgba(16, 42, 67, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.kpi-card.pending::before {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.kpi-card.collected::before {
+  background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+.kpi-title {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Charts Section */
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 18px 30px rgba(16, 42, 67, 0.06);
+}
+
+.chart-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+/* Excel-like Data Grid */
+.excel-grid-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.excel-toolbar {
+  padding: 12px 16px;
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.excel-search {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  width: min(420px, 100%);
+  font-size: 0.9rem;
+}
+
+.excel-search:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.excel-table-wrapper {
+  overflow-x: auto;
+  max-height: 500px;
+}
+
+.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.excel-table th {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.excel-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.excel-table tr:nth-child(even) {
+  background: rgba(16, 42, 67, 0.02);
+}
+
+.excel-table tr:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.amount-cell {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+  text-align: right !important;
+}
+
+/* Custom Tooltip for Recharts */
+.custom-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 18px 30px rgba(16, 42, 67, 0.12);
+}
+
+.custom-tooltip .label {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-bar select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text);
+  min-width: 150px;
+}
+
+.filter-bar select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Clickable Student Name */
+.student-name-cell {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline transparent;
+  transition: all 0.2s;
+}
+
+.student-name-cell:hover {
+  text-decoration: underline var(--primary);
+  color: var(--primary);
+}
+
+/* Student Profile Modal */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.profile-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0f172a;
+}
+
+.profile-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.profile-stat {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.profile-stat label {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.profile-stat span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.profile-stat.highlight {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.profile-stat.highlight span {
+  color: #3b82f6;
+}
+
+.custom-tooltip .val {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1rem;
+}
