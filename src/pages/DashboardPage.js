@@ -75,16 +75,32 @@ function DashboardPage() {
 
       <div className="dashboard-grid">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="glass-card stat-card">
-            <div className="stat-icon-wrapper" style={{ background: kpi.color }}>
-              <span>{kpi.icon}</span>
-            </div>
-            <p className="text-muted small fw-bold m-0">{kpi.label}</p>
-            <div className="d-flex align-items-baseline gap-2">
-              <span className="stat-value">{kpi.value}</span>
-              <span className={`stat-trend ${kpi.trend.includes('+') ? 'trend-up' : ''}`}>
+          <div key={idx} className="glass-card stat-card hover-lift">
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="stat-icon-wrapper" style={{ background: kpi.color, marginBottom: 0 }}>
+                <span>{kpi.icon}</span>
+              </div>
+              <div className={`stat-trend ${kpi.trend.includes('+') ? 'trend-up' : 'trend-down'} small fw-bold`}>
                 {kpi.trend}
-              </span>
+              </div>
+            </div>
+            <div className="mt-3">
+              <p className="text-muted small fw-bold m-0 uppercase" style={{ letterSpacing: '0.05em' }}>{kpi.label}</p>
+              <h3 className="stat-value m-0">{kpi.value}</h3>
+            </div>
+            <div style={{ width: '100%', height: '40px', marginTop: '1rem' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke={idx % 2 === 0 ? 'var(--primary)' : 'var(--success)'} 
+                    strokeWidth={2} 
+                    fillOpacity={0.1} 
+                    fill={idx % 2 === 0 ? 'var(--primary)' : 'var(--success)'} 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         ))}

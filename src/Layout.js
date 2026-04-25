@@ -129,14 +129,15 @@ function Layout() {
             size="sm" 
             value={theme} 
             onChange={(e) => setTheme(e.target.value)} 
-            className="mb-3 border-0 bg-light rounded-pill px-3"
+            className="mb-3 border-0 bg-light rounded-pill px-3 fw-bold"
           >
-            <option value="default">✨ Modern</option>
-            <option value="ocean">🌊 Ocean</option>
-            <option value="forest">🌿 Forest</option>
-            <option value="dark">🌙 Midnight</option>
+            <option value="default">💎 Modern Azure</option>
+            <option value="midnight">🌑 Midnight Pro</option>
+            <option value="lavender">🔮 Royal Velvet</option>
+            <option value="sunset">🌅 Crimson Sunset</option>
+            <option value="emerald">🌿 Emerald Forest</option>
           </Form.Select>
-          <button className="btn btn-link text-danger p-0 nav-link" onClick={handleLogout}>
+          <button className="btn btn-link text-danger p-0 nav-link fw-semibold" onClick={handleLogout}>
             🚪 Sign out
           </button>
         </div>

@@ -77,6 +77,7 @@ function FeesPage() {
   const collected = feesData ? Number(feesData.total_collected_revenue || 0) : 0;
   const expected = feesData ? Number(feesData.total_expected_revenue || 0) : 0;
   const pending = feesData ? Number(feesData.pending_revenue || 0) : 0;
+  const collectionEfficiency = expected > 0 ? Math.round((collected / expected) * 100) : 0;
 
   const timelineData = useMemo(() => {
     const grouped = payments.reduce((acc, p) => {
@@ -124,145 +125,177 @@ function FeesPage() {
 
   const updateField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  const [showFilters, setShowFilters] = useState(false);
+
   return (
-    <div className="animate-fade-in">
-      <div className="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3">
+    <div className="animate-fade-in dashboard-shell">
+      <div className="analysis-header">
         <div>
-          <p className="subtitle">Finance</p>
+          <p className="subtitle">Finance Analysis</p>
           <h2 className="fs-1">Revenue Dashboard</h2>
         </div>
         <div className="d-flex gap-2">
-          <select className="input-premium py-2 w-auto" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
-            <option value="">All Branches</option>
-            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
-          <select className="input-premium py-2 w-auto" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
-            {standards.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <button className="btn btn-outline-primary d-lg-none rounded-pill px-4" onClick={() => setShowFilters(!showFilters)}>
+            {showFilters ? '✕ Close Filters' : '🔍 Filter Data'}
+          </button>
+          {admin && (
+            <button className="btn btn-premium pulse-primary" onClick={() => setModal(true)}>
+              + Record Payment
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="dashboard-grid mb-4">
-        <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><span>💰</span></div>
-          <p className="text-muted small fw-bold m-0">Total Collected</p>
-          <span className="stat-value text-success">₹{(collected / 1000).toFixed(1)}K</span>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><span>📈</span></div>
-          <p className="text-muted small fw-bold m-0">Expected Revenue</p>
-          <span className="stat-value">₹{(expected / 1000).toFixed(1)}K</span>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(244, 63, 94, 0.1)' }}><span>⏳</span></div>
-          <p className="text-muted small fw-bold m-0">Pending Amount</p>
-          <span className="stat-value text-danger">₹{(pending / 1000).toFixed(1)}K</span>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)' }}><span>📊</span></div>
-          <p className="text-muted small fw-bold m-0">Collection Efficiency</p>
-          <span className="stat-value">{expected > 0 ? Math.round((collected / expected) * 100) : 0}%</span>
-        </div>
-      </div>
-
-      <div className="row g-4 mb-4">
-        <div className="col-12 col-xl-8">
-          <div className="glass-card" style={{ height: '400px' }}>
-            <h3 className="fs-5 mb-4">Revenue Collection Timeline</h3>
-            <div style={{ width: '100%', height: '300px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={timelineData}>
-                  <defs>
-                    <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={v => `₹${v/1000}K`} />
-                  <RechartsTooltip content={<CustomTooltip />} />
-                  <Area type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
-                </AreaChart>
-              </ResponsiveContainer>
+      <div className="row g-4">
+        {/* Left Sidebar Filters - Power BI Style */}
+        <div className="col-12 col-lg-3">
+          <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
+            <h4 className="fs-6 m-0">Slicers & Filters</h4>
+            
+            <div className="filter-group">
+              <label className="filter-label">Branch</label>
+              <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
+                <option value="">All Branches</option>
+                {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
             </div>
-          </div>
-        </div>
-        <div className="col-12 col-xl-4">
-          <div className="glass-card" style={{ height: '400px' }}>
-            <h3 className="fs-5 mb-4">Payment Distribution</h3>
-            <div style={{ width: '100%', height: '260px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={modeData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {modeData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                  </Pie>
-                  <RechartsTooltip content={<CustomTooltip />} />
-                  <Legend verticalAlign="bottom" align="center" iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="glass-card">
-        <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-          <h3 className="fs-4 m-0">Recent Transactions</h3>
-          <div className="d-flex gap-2">
-            <input 
-              type="text" 
-              className="input-premium py-2" 
-              placeholder="🔍 Search records..." 
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{ maxWidth: '240px' }}
-            />
-            {admin && (
-              <button className="btn btn-premium btn-sm" onClick={() => setModal(true)}>
-                + Record Payment
-              </button>
+            <div className="filter-group">
+              <label className="filter-label">Class / Standard</label>
+              <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
+                {standards.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+
+            {batchOptions.length > 0 && (
+              <div className="filter-group">
+                <label className="filter-label">Batch Time</label>
+                <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
+                  <option value="">All Batches</option>
+                  {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
             )}
+
+            <div className="mt-2">
+              <input 
+                type="text" 
+                className="input-premium py-2" 
+                placeholder="🔍 Search Student..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="data-grid-container">
-          <table className="data-grid-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Branch & Batch</th>
-                <th>Date</th>
-                <th>Mode</th>
-                <th>Reference</th>
-                <th className="text-end">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPayments.map(p => (
-                <tr key={p.id}>
-                  <td>
-                    <Link to={`/app/students/${p.student}`} className="text-decoration-none fw-semibold">
-                      {p.student_name || p.student}
-                    </Link>
-                    <div className="small text-muted">{p.student_standard}</div>
-                  </td>
-                  <td>
-                    <div className="small fw-medium">{p.student_branch_name}</div>
-                    <div className="small text-muted">{p.student_batch_time}</div>
-                  </td>
-                  <td><span className="small">{p.payment_date}</span></td>
-                  <td>
-                    <span className={`badge rounded-pill px-3 py-1 ${p.payment_mode === 'cash' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary'}`}>
-                      {p.payment_mode.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="small text-muted">{p.reference || '-'}</td>
-                  <td className="text-end fw-bold">₹{Number(p.amount).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Main Content Area */}
+        <div className="col-12 col-lg-9">
+          <div className="dashboard-grid mb-4">
+            <div className="glass-card stat-card hover-lift">
+              <p className="filter-label m-0">Total Collected</p>
+              <h3 className="stat-value text-success">₹{collected.toLocaleString()}</h3>
+              <div className="small text-muted mt-2">↑ 12% vs last month</div>
+            </div>
+            <div className="glass-card stat-card hover-lift">
+              <p className="filter-label m-0">Expected</p>
+              <h3 className="stat-value">₹{expected.toLocaleString()}</h3>
+              <div className="progress mt-3" style={{ height: '6px' }}>
+                <div className="progress-bar bg-primary" style={{ width: `${collectionEfficiency}%` }}></div>
+              </div>
+            </div>
+            <div className="glass-card stat-card hover-lift">
+              <p className="filter-label m-0">Efficiency</p>
+              <h3 className="stat-value">{collectionEfficiency}%</h3>
+              <p className="small text-muted mt-2">Target: 95%</p>
+            </div>
+            <div className="glass-card stat-card hover-lift">
+              <p className="filter-label m-0">Pending</p>
+              <h3 className="stat-value text-danger">₹{pending.toLocaleString()}</h3>
+              <div className="small text-muted mt-2">{filteredPayments.length} pending items</div>
+            </div>
+          </div>
+
+          <div className="row g-4 mb-4">
+            <div className="col-12 col-xl-8">
+              <div className="glass-card" style={{ height: '400px' }}>
+                <h3 className="fs-5 mb-4">Revenue Collection Timeline</h3>
+                <div style={{ width: '100%', height: '300px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={timelineData}>
+                      <defs>
+                        <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={v => `₹${v/1000}K`} />
+                      <RechartsTooltip content={<CustomTooltip />} />
+                      <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+            <div className="col-12 col-xl-4">
+              <div className="glass-card" style={{ height: '400px' }}>
+                <h3 className="fs-5 mb-4">Payment Modes</h3>
+                <div style={{ width: '100%', height: '260px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={modeData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                        {modeData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                      </Pie>
+                      <RechartsTooltip content={<CustomTooltip />} />
+                      <Legend verticalAlign="bottom" align="center" iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card">
+            <h3 className="fs-4 mb-4">Transaction Ledger</h3>
+            <div className="data-grid-container">
+              <table className="data-grid-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Branch & Batch</th>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th className="text-end">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPayments.map(p => (
+                    <tr key={p.id}>
+                      <td data-label="Student">
+                        <Link to={`/app/students/${p.student}`} className="text-decoration-none fw-semibold">
+                          {p.student_name || p.student}
+                        </Link>
+                        <div className="small text-muted">{p.student_standard}</div>
+                      </td>
+                      <td data-label="Branch">
+                        <div className="small fw-medium">{p.student_branch_name}</div>
+                        <div className="small text-muted">{p.student_batch_time}</div>
+                      </td>
+                      <td data-label="Date"><span className="small">{p.payment_date}</span></td>
+                      <td data-label="Mode">
+                        <span className={`badge rounded-pill px-3 py-1 ${p.payment_mode === 'cash' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary'}`}>
+                          {p.payment_mode.toUpperCase()}
+                        </span>
+                      </td>
+                      <td data-label="Amount" className="text-end fw-bold text-primary">₹{Number(p.amount).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 

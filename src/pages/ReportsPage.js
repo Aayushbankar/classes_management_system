@@ -21,48 +21,75 @@ function ReportsPage() {
   };
 
   return (
-    <div className="page-panel">
-      <div className="dashboard-header">
-        <p className="subtitle">Finance</p>
-        <h2>Fee Reports</h2>
+    <div className="animate-fade-in dashboard-shell">
+      <div className="analysis-header">
+        <div>
+          <p className="subtitle">Financial Integrity</p>
+          <h2 className="fs-1">Fee Reports</h2>
+        </div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && <div className="alert alert-danger rounded-pill px-4">{error}</div>}
 
-      <div className="card-grid">
-        <div className="stat-card"><p className="stat-label">Expected Revenue</p><h3>{fmt(expected)}</h3></div>
-        <div className="stat-card"><p className="stat-label">Collected</p><h3>{fmt(collected)}</h3></div>
-        <div className="stat-card"><p className="stat-label">Pending</p><h3>{fmt(pending)}</h3></div>
-        <div className="stat-card"><p className="stat-label">Collection Rate</p><h3>{rate}%</h3></div>
-      </div>
-
-      <div className="chart-grid">
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <h3>Collection Progress</h3>
-            <span>{rate}%</span>
+      <div className="dashboard-grid">
+        <div className="glass-card stat-card hover-lift">
+          <p className="filter-label m-0">Expected Revenue</p>
+          <h3 className="stat-value">{fmt(expected)}</h3>
+          <div className="small text-muted mt-2">Target for current session</div>
+        </div>
+        <div className="glass-card stat-card hover-lift">
+          <p className="filter-label m-0">Collected</p>
+          <h3 className="stat-value text-success">{fmt(collected)}</h3>
+          <div className="progress mt-3" style={{ height: '6px' }}>
+            <div className="progress-bar bg-success" style={{ width: `${rate}%` }}></div>
           </div>
-          <div className="progress-block">
-            <div className="progress-label">Collected vs Expected</div>
-            <div className="progress-track">
-              <div className="progress-fill" style={{ width: `${rate}%` }} />
+        </div>
+        <div className="glass-card stat-card hover-lift">
+          <p className="filter-label m-0">Pending</p>
+          <h3 className="stat-value text-danger">{fmt(pending)}</h3>
+          <p className="small text-muted mt-2">Requires immediate attention</p>
+        </div>
+        <div className="glass-card stat-card hover-lift">
+          <p className="filter-label m-0">Collection Rate</p>
+          <h3 className="stat-value">{rate}%</h3>
+          <div className="small text-muted mt-2">Efficiency index</div>
+        </div>
+      </div>
+
+      <div className="row g-4 mt-2">
+        <div className="col-12 col-lg-6">
+          <div className="glass-card">
+            <h3 className="fs-5 mb-4">Collection Progress</h3>
+            <div className="d-flex align-items-center justify-content-between mb-2">
+              <span className="fw-bold">Total Collection Progress</span>
+              <span className="badge bg-primary-subtle text-primary rounded-pill px-3">{rate}%</span>
             </div>
-            <div className="progress-insight">{fmt(collected)} of {fmt(expected)}</div>
+            <div className="progress rounded-pill mb-3" style={{ height: '12px' }}>
+              <div className="progress-bar" style={{ width: `${rate}%`, background: 'var(--primary-gradient)' }}></div>
+            </div>
+            <p className="text-muted small m-0">
+              You have collected <strong>{fmt(collected)}</strong> out of a total expected <strong>{fmt(expected)}</strong>.
+            </p>
           </div>
         </div>
 
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <h3>Revenue Breakdown</h3>
-          </div>
-          <div className="report-row">
-            <span>Expected</span><strong>{fmt(expected)}</strong>
-          </div>
-          <div className="report-row">
-            <span>Collected</span><strong style={{ color: '#22c55e' }}>{fmt(collected)}</strong>
-          </div>
-          <div className="report-row">
-            <span>Pending</span><strong style={{ color: '#ef4444' }}>{fmt(pending)}</strong>
+        <div className="col-12 col-lg-6">
+          <div className="glass-card">
+            <h3 className="fs-5 mb-4">Detailed Breakdown</h3>
+            <div className="list-group list-group-flush">
+              <div className="list-group-item bg-transparent d-flex justify-content-between px-0 py-3 border-light">
+                <span className="text-muted">Expected Revenue</span>
+                <span className="fw-bold">{fmt(expected)}</span>
+              </div>
+              <div className="list-group-item bg-transparent d-flex justify-content-between px-0 py-3 border-light">
+                <span className="text-muted">Total Collected</span>
+                <span className="fw-bold text-success">{fmt(collected)}</span>
+              </div>
+              <div className="list-group-item bg-transparent d-flex justify-content-between px-0 py-3 border-light">
+                <span className="text-muted">Total Pending</span>
+                <span className="fw-bold text-danger">{fmt(pending)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
