@@ -2,7 +2,25 @@
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #0f2027, #2c5364); /* neutral dark */
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Container */
@@ -12,50 +30,67 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
-
-
+  perspective: 1000px;
+  /* For 3D effects */
 }
 
 /* 🔥 Watermark (Logo Friendly) */
 .watermark {
-  
+
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 
   width: 420px;
-
-  opacity: 0.100;           /* very very light */
-  filter: grayscale(100%) contrast(0.5);
-
+  opacity: 0.15;
+  filter: none;
   pointer-events: none;
-  z-index: 100;
+  z-index: 0;
 }
 
 /* Card */
 .login-card {
   width: 100%;
-  max-width: 360px;
-  padding: 35px 30px;
-  border-radius: 16px;
+  max-width: 380px;
+  padding: 45px 35px;
+  border-radius: 24px;
   text-align: center;
 
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  /* 3D Glass Effect */
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
   color: white;
+  position: relative;
+  z-index: 1;
+
+  /* Subtle 3D tilt effect */
+  transform: rotateX(2deg) rotateY(-2deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: rotateX(0deg) rotateY(0deg) translateY(-5px);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    inset 0 0 30px rgba(255, 255, 255, 0.1);
 }
 
 /* Logo */
 .top-logo {
   width: 80px;
   margin-bottom: 10px;
-  background: white;          /* makes logo clean */
+  background: white;
+  /* makes logo clean */
   padding: 6px;
   border-radius: 50%;
 }
@@ -70,7 +105,7 @@ h2 {
 .input-box {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   padding: 10px;
   margin: 12px 0;
@@ -120,7 +155,7 @@ button {
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(30,144,255,0.5);
+  box-shadow: 0 5px 15px rgba(30, 144, 255, 0.5);
 }
 
 /* Signup */

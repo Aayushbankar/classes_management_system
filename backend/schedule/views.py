@@ -29,6 +29,10 @@ class TimetableSlotViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(standard__icontains=standard)
         if batch_time:
             queryset = queryset.filter(batch_time__icontains=batch_time)
+        
+        teacher_id = self.request.query_params.get('teacher')
+        if teacher_id:
+            queryset = queryset.filter(teacher_id=teacher_id)
 
         return queryset
 

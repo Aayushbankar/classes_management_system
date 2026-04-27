@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson } from '../api';
+import { fetchJson, fetchList } from '../api';
+import { formatCurrency } from '../utils/format';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -18,13 +19,13 @@ function TimetablePage() {
     if (searchBatch) params.append('batch_time', searchBatch);
     if (searchBranch) params.append('branch', searchBranch);
     
-    fetchJson(`/schedule/timetable/?${params.toString()}`)
-      .then(data => setSlots(Array.isArray(data) ? data : data.results || []))
+    fetchList(`/schedule/timetable/?${params.toString()}`)
+      .then(setSlots)
       .catch(e => setError(e.message));
   }, [searchStandard, searchBatch, searchBranch]);
 
   useEffect(() => {
-    fetchJson('/branches/').then(data => setBranches(Array.isArray(data) ? data : data.results || [])).catch(() => {});
+    fetchList('/branches/').then(setBranches).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ function TimetablePage() {
       <div className="dashboard-grid mb-4" style={{ gridTemplateColumns: '1fr' }}>
         <div className="glass-card stat-card">
           <p className="filter-label m-0">Total Slots</p>
-          <span className="stat-value">{slots.length}</span>
+          <span className="stat-value">{formatCurrency(slots.length)}</span>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { fetchJson } from '../api';
+import { fetchJson, fetchList } from '../api';
+import { formatINR } from '../utils/format';
 
 function StudentDetailPage() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ function StudentDetailPage() {
 
     const loadPayments = async () => {
       try {
-        const paymentData = await fetchJson(`/finance/payments/?student=${id}`);
+        const paymentData = await fetchList(`/finance/payments/?student=${id}`);
         setPayments(paymentData);
       } catch (e) {
         // ignore payment errors, student details are primary
@@ -101,9 +102,9 @@ function StudentDetailPage() {
               <div className="info-stat"><label>Parent</label><span>{student.parent_name || '-'}</span></div>
               <div className="info-stat"><label>Contact</label><span>{student.contact_number || '-'}</span></div>
               <div className="info-stat"><label>Admission</label><span>{student.admission_date || '-'}</span></div>
-              <div className="info-stat"><label>Fee Decided</label><span>₹{Number(student.decided_fee || 0).toLocaleString()}</span></div>
-              <div className="info-stat"><label>Paid Fee</label><span>₹{Number(student.paid_fee || 0).toLocaleString()}</span></div>
-              <div className="info-stat highlight"><label>Fee Left</label><span>₹{feeLeft.toLocaleString()}</span></div>
+              <div className="info-stat"><label>Fee Decided</label><span>{formatINR(student.decided_fee)}</span></div>
+              <div className="info-stat"><label>Paid Fee</label><span>{formatINR(student.paid_fee)}</span></div>
+              <div className="info-stat highlight"><label>Fee Left</label><span>{formatINR(feeLeft)}</span></div>
               <div className="info-stat"><label>Notes</label><span className="prewrap">{student.critical_notes || '-'}</span></div>
             </div>
           </div>
@@ -128,7 +129,7 @@ function StudentDetailPage() {
                 {payments.map(payment => (
                   <tr key={payment.id}>
                     <td>{payment.payment_date}</td>
-                    <td>₹{Number(payment.amount).toLocaleString()}</td>
+                    <td>{formatINR(payment.amount)}</td>
                     <td>{payment.payment_mode}</td>
                     <td>{payment.reference || '-'}</td>
                   </tr>

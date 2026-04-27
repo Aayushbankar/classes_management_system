@@ -26,6 +26,24 @@ const ROLE_BADGES = {
   assistant: { label: 'Assistant', bg: 'rgba(100,116,139,0.15)', color: '#64748b' },
 };
 
+const Field = ({ label, id, type = 'text', value, onChange, error: fieldError, placeholder }) => (
+  <div className="mb-3">
+    <label htmlFor={id} className="d-block mb-1" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      {label}
+    </label>
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="input-premium"
+      style={{ borderColor: fieldError ? 'var(--danger)' : undefined }}
+    />
+    {fieldError && <span style={{ fontSize: '0.75rem', color: 'var(--danger)' }}>{fieldError}</span>}
+  </div>
+);
+
 function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
@@ -97,23 +115,6 @@ function ProfilePage() {
   const roleBadge = ROLE_BADGES[profile?.role] || ROLE_BADGES.assistant;
   const initials = getInitials(profile?.username, profile?.first_name, profile?.last_name);
 
-  const Field = ({ label, id, type = 'text', value, onChange, error: fieldError, placeholder }) => (
-    <div className="mb-3">
-      <label htmlFor={id} className="d-block mb-1" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-        {label}
-      </label>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="input-premium"
-        style={{ borderColor: fieldError ? 'var(--danger)' : undefined }}
-      />
-      {fieldError && <span style={{ fontSize: '0.75rem', color: 'var(--danger)' }}>{fieldError}</span>}
-    </div>
-  );
 
   return (
     <div className="animate-fade-in dashboard-shell">

@@ -5,6 +5,7 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import { Badge } from 'react-bootstrap';
+import { formatINR } from '../utils/format';
 
 function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -35,11 +36,7 @@ function DashboardPage() {
   const pending = fees ? Number(fees.pending_revenue || 0) : 0;
   const collectionRate = expected > 0 ? Math.round((collected / expected) * 100) : 0;
 
-  const fmt = (n) => {
-    if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
-    if (n >= 1000) return `₹${(n / 1000).toFixed(1)}K`;
-    return `₹${n}`;
-  };
+  const fmt = (n) => formatINR(n);
 
   const trendData = [
     { name: 'Mon', value: 400 },

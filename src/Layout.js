@@ -67,6 +67,7 @@ function Layout() {
     { value: "lavender", label: "Royal Velvet", icon: "🔮" },
     { value: "sunset", label: "Crimson Sunset", icon: "🌅" },
     { value: "emerald", label: "Emerald Forest", icon: "🌿" },
+    { value: "cyberpunk", label: "Cyberpunk Neon", icon: "⚡" },
   ];
 
   useEffect(() => {
@@ -103,7 +104,10 @@ function Layout() {
 
   useEffect(() => { loadNotifications(); }, []);
 
-  const handleLogout = () => { clearSession(); navigate("/"); };
+  const handleLogout = () => {
+    clearSession();
+    window.location.href = "/";
+  };
 
   const filteredPages = pages.filter(page => 
     page.name.toLowerCase().includes(searchQuery.toLowerCase())

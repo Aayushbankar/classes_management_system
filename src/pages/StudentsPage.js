@@ -2,8 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 import { exportToExcel, STUDENT_COLS } from '../utils/export';
+import { formatINR } from '../utils/format';
 
-const emptyStudent = { name: '', parent_name: '', contact_number: '', standard: '', batch_time: '', roll_number: '', branch: '', decided_fee: '0', paid_fee: '0', status: 'active' };
+const emptyStudent = { 
+  name: '', parent_name: '', contact_number: '', standard: '', batch_time: '', 
+  roll_number: '', branch: '', decided_fee: '0', paid_fee: '0', 
+  status: 'active', payment_mode: 'cash' 
+};
+
+const STANDARDS = [
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", 
+  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", 
+  "Class 11 (Sci)", "Class 11 (Com)", "Class 11 (Arts)",
+  "Class 12 (Sci)", "Class 12 (Com)", "Class 12 (Arts)",
+  "NEET", "JEE", "Foundation", "Other"
+];
+
+const BATCH_TIMES = [
+  "07:00 AM - 09:00 AM",
+  "09:00 AM - 11:00 AM",
+  "11:00 AM - 01:00 PM",
+  "01:00 PM - 03:00 PM",
+  "04:00 PM - 06:00 PM",
+  "06:00 PM - 08:00 PM",
+  "Special Batch",
+  "Crash Course"
+];
 
 function validateStudent(form) {
   const errs = {};
@@ -35,12 +59,11 @@ function StudentCard({ s, admin, onEdit, onDelete }) {
         {s.roll_number && <span>🪪 Roll #{s.roll_number}</span>}
         {s.contact_number && <span>📞 {s.contact_number}</span>}
       </div>
-      {/* Fee progress */}
       <div className="mb-2">
         <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
           <span>Fee Paid</span>
           <span className={feeLeft > 0 ? 'text-danger fw-bold' : 'text-success fw-bold'}>
-            {feeLeft > 0 ? `₹${feeLeft} pending` : 'Paid in full'}
+            {feeLeft > 0 ? `${formatINR(feeLeft)} pending` : 'Paid in full'}
           </span>
         </div>
         <div style={{ height: 5, borderRadius: 3, background: 'var(--border)' }}>
@@ -56,6 +79,14 @@ function StudentCard({ s, admin, onEdit, onDelete }) {
     </div>
   );
 }
+
+const Field = ({ label, id, type = 'text', value, onChange, error: fe, placeholder }) => (
+  <div>
+    <label htmlFor={id} className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>{label}</label>
+    <input id={id} type={type} value={value} onChange={onChange} className="input-premium" placeholder={placeholder} style={{ borderColor: fe ? 'var(--danger)' : undefined }} />
+    {fe && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{fe}</span>}
+  </div>
+);
 
 function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -86,8 +117,8 @@ function StudentsPage() {
   const totalFee = students.reduce((s, st) => s + Number(st.decided_fee || 0), 0);
   const pendingFee = students.reduce((s, st) => s + Number(st.fee_left ?? Math.max(0, st.decided_fee - st.paid_fee) ?? 0), 0);
 
-  const openAdd = () => { setForm({ ...emptyStudent, branch: branches[0]?.id || '' }); setEditId(null); setFormErrors({}); setModal('add'); };
-  const openEdit = (s) => { setForm({ ...s, branch: s.branch || s.branch_id || '' }); setEditId(s.id); setFormErrors({}); setModal('edit'); };
+  const openAdd = () => { setForm({ ...emptyStudent, branch: branches[0]?.id || '', standard: STANDARDS[0] }); setEditId(null); setFormErrors({}); setModal('add'); };
+  const openEdit = (s) => { setForm({ ...s, branch: s.branch || s.branch_id || '', payment_mode: 'cash' }); setEditId(s.id); setFormErrors({}); setModal('edit'); };
 
   const handleSave = async () => {
     const errs = validateStudent(form);
@@ -106,14 +137,6 @@ function StudentsPage() {
   };
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  const Field = ({ label, id, type = 'text', value, onChange, error: fe, placeholder }) => (
-    <div>
-      <label htmlFor={id} className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>{label}</label>
-      <input id={id} type={type} value={value} onChange={onChange} className="input-premium" placeholder={placeholder} style={{ borderColor: fe ? 'var(--danger)' : undefined }} />
-      {fe && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{fe}</span>}
-    </div>
-  );
 
   return (
     <div className="animate-fade-in">
@@ -136,7 +159,6 @@ function StudentsPage() {
 
       {error && <div className="alert alert-danger rounded-pill px-4 mb-3">{error}</div>}
 
-      {/* KPI row */}
       <div className="dashboard-grid mb-4">
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper" style={{ background: 'var(--primary-soft)' }}><span>🎓</span></div>
@@ -151,16 +173,15 @@ function StudentsPage() {
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper" style={{ background: 'rgba(244, 63, 94, 0.1)' }}><span>💰</span></div>
           <p className="text-muted small fw-bold m-0">Expected Revenue</p>
-          <span className="stat-value">₹{(totalFee / 1000).toFixed(1)}K</span>
+          <span className="stat-value">{formatINR(totalFee)}</span>
         </div>
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)' }}><span>⏳</span></div>
           <p className="text-muted small fw-bold m-0">Pending Fees</p>
-          <span className="stat-value">₹{(pendingFee / 1000).toFixed(1)}K</span>
+          <span className="stat-value">{formatINR(pendingFee)}</span>
         </div>
       </div>
 
-      {/* Filters */}
       <div className="glass-card">
         <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
           <h3 className="fs-5 m-0">Student Registry</h3>
@@ -174,7 +195,6 @@ function StudentsPage() {
           </div>
         </div>
 
-        {/* Desktop: Table */}
         <div className="d-none d-md-block">
           <div className="data-grid-container">
             <table className="data-grid-table">
@@ -193,7 +213,7 @@ function StudentsPage() {
                     </td>
                     <td><span className="badge bg-light text-dark border">{s.standard}</span></td>
                     <td>{s.branch_name || s.branch}</td>
-                    <td><span className={Number(s.fee_left ?? (s.decided_fee - s.paid_fee)) > 0 ? 'text-danger fw-bold' : 'text-success'}>₹{s.fee_left ?? (s.decided_fee - s.paid_fee)}</span></td>
+                    <td><span className={Number(s.fee_left ?? (s.decided_fee - s.paid_fee)) > 0 ? 'text-danger fw-bold' : 'text-success'}>{formatINR(s.fee_left ?? (s.decided_fee - s.paid_fee))}</span></td>
                     <td>
                       <span className={`badge rounded-pill px-3 ${s.status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'}`}>{s.status}</span>
                     </td>
@@ -210,7 +230,6 @@ function StudentsPage() {
           </div>
         </div>
 
-        {/* Mobile: Cards */}
         <div className="d-md-none">
           {students.length === 0 && (
             <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}>
@@ -224,31 +243,65 @@ function StudentsPage() {
         </div>
       </div>
 
-      {/* Modal */}
       {modal && (
         <div className="command-palette-overlay" onClick={() => setModal(null)}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="fs-4">{modal === 'add' ? '✨ Add New Student' : '📝 Edit Student Record'}</h3>
-              <button className="btn btn-link text-decoration-none fs-4" style={{ color: 'var(--text-primary)' }} onClick={() => setModal(null)}>&times;</button>
+              <h3 className="fs-4 m-0">{modal === 'add' ? '✨ Add New Student' : '📝 Edit Student Record'}</h3>
+              <button className="btn btn-link text-decoration-none fs-4 p-0 m-0" style={{ color: 'var(--text-primary)', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setModal(null)}>&times;</button>
             </div>
             <div className="row g-3">
               <div className="col-12"><Field label="Full Name *" id="s_name" value={form.name} onChange={e => set('name', e.target.value)} error={formErrors.name} placeholder="Student full name" /></div>
-              <div className="col-md-6"><Field label="Standard / Class" id="s_std" value={form.standard} onChange={e => set('standard', e.target.value)} placeholder="e.g. Class 10" /></div>
+              
+              <div className="col-md-6">
+                <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Standard / Class</label>
+                <select value={form.standard} onChange={e => set('standard', e.target.value)} className="input-premium">
+                  <option value="">Select Standard</option>
+                  {STANDARDS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
               <div className="col-md-6"><Field label="Roll Number" id="s_roll" value={form.roll_number} onChange={e => set('roll_number', e.target.value)} placeholder="e.g. 101" /></div>
               <div className="col-12"><Field label="Parent / Guardian Name" id="s_parent" value={form.parent_name} onChange={e => set('parent_name', e.target.value)} placeholder="Parent name" /></div>
               <div className="col-12"><Field label="Contact Number" id="s_phone" value={form.contact_number} onChange={e => set('contact_number', e.target.value)} error={formErrors.contact_number} placeholder="+91 9876543210" /></div>
-              <div className="col-12"><Field label="Batch / Timing" id="s_batch" value={form.batch_time} onChange={e => set('batch_time', e.target.value)} placeholder="e.g. Morning 9–11am" /></div>
+              <div className="col-12">
+                <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Batch / Timing</label>
+                <select value={form.batch_time} onChange={e => set('batch_time', e.target.value)} className="input-premium">
+                  <option value="">Select Batch/Time</option>
+                  {BATCH_TIMES.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
+              
               <div className="col-md-6">
                 <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Decided Fee (₹)</label>
                 <input type="number" value={form.decided_fee} onChange={e => set('decided_fee', e.target.value)} className="input-premium" min="0" />
                 {formErrors.decided_fee && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{formErrors.decided_fee}</span>}
               </div>
+
               <div className="col-md-6">
                 <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Paid Fee (₹)</label>
                 <input type="number" value={form.paid_fee} onChange={e => set('paid_fee', e.target.value)} className="input-premium" min="0" />
                 {formErrors.paid_fee && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{formErrors.paid_fee}</span>}
               </div>
+
+              {Number(form.paid_fee) > 0 && (
+                <div className="col-12 animate-fade-in">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Initial Payment Mode</label>
+                  <div className="d-flex gap-2">
+                    {['cash', 'upi', 'cheque'].map(mode => (
+                      <button 
+                        key={mode} 
+                        className={`btn flex-grow-1 py-2 rounded-pill fw-bold text-uppercase ${form.payment_mode === mode ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        style={{ fontSize: '0.75rem' }}
+                        onClick={() => set('payment_mode', mode)}
+                      >
+                        {mode}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="col-md-6">
                 <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Branch</label>
                 <select value={form.branch} onChange={e => set('branch', e.target.value)} className="input-premium">

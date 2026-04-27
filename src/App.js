@@ -9,6 +9,7 @@ import BranchesPage from "./pages/BranchesPage";
 import StudentsPage from "./pages/StudentsPage";
 import StudentDetailPage from "./pages/StudentDetailPage";
 import TeachersPage from "./pages/TeachersPage";
+import TeacherDetailPage from "./pages/TeacherDetailPage";
 import FeesPage from "./pages/FeesPage";
 import TimetablePage from "./pages/TimetablePage";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -38,6 +39,7 @@ function App() {
           <Route path="students"      element={wrap(<StudentsPage />)} />
           <Route path="students/:id"  element={wrap(<StudentDetailPage />)} />
           <Route path="teachers"      element={wrap(<TeachersPage />)} />
+          <Route path="teachers/:id"  element={wrap(<TeacherDetailPage />)} />
           <Route path="fees"          element={wrap(<FeesPage />)} />
           <Route path="timetable"     element={wrap(<TimetablePage />)} />
           <Route path="notifications" element={wrap(<NotificationsPage />)} />

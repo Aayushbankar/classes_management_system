@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson, postJson } from '../api';
+import { fetchJson, fetchList, postJson } from '../api';
 
 function timeAgo(dateStr) {
   const now = new Date();
@@ -19,8 +19,8 @@ function NotificationsPage() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
 
-  const load = () => fetchJson('/notifications/')
-    .then(data => setItems(Array.isArray(data) ? data : data.results || []))
+  const load = () => fetchList('/notifications/')
+    .then(setItems)
     .catch(e => setError(e.message));
   useEffect(() => { load(); }, []);
 

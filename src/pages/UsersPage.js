@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson, postJson, putJson, deleteJson, getCurrentUser, canManageUsers } from '../api';
+import { fetchJson, fetchList, postJson, putJson, deleteJson, getCurrentUser, canManageUsers } from '../api';
 
 const emptyForm = {
   username: '',
@@ -31,11 +31,11 @@ function UsersPage() {
     setLoading(true);
     try {
       const [usersData, branchesData] = await Promise.all([
-        fetchJson('/auth/users/'),
-        fetchJson('/branches/'),
+        fetchList('/auth/users/'),
+        fetchList('/branches/'),
       ]);
-      setUsers(Array.isArray(usersData) ? usersData : []);
-      setBranches(Array.isArray(branchesData) ? branchesData : []);
+      setUsers(usersData);
+      setBranches(branchesData);
     } catch (e) {
       setError(e.message);
     } finally {

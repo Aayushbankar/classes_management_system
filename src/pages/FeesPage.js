@@ -4,13 +4,14 @@ import { fetchJson, fetchList, postJson, isAdmin } from '../api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import FeeReceipt from '../components/FeeReceipt';
 import { exportToExcel, PAYMENT_COLS } from '../utils/export';
+import { formatCurrency, formatINR } from '../utils/format';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="glass p-2 rounded shadow-lg border-0" style={{ background: 'var(--surface)', minWidth: '120px' }}>
         <p className="small fw-bold mb-1 text-muted">{label || payload[0].name}</p>
-        <p className="fs-5 fw-bold m-0 text-primary">₹{payload[0].value.toLocaleString()}</p>
+        <p className="fs-5 fw-bold m-0 text-primary">{formatINR(payload[0].value)}</p>
       </div>
     );
   }
@@ -96,9 +97,11 @@ function FeesPage() {
       acc[mode] = (acc[mode] || 0) + Number(p.amount);
       return acc;
     }, {});
+    const total = Object.values(grouped).reduce((a, b) => a + b, 0);
     return Object.keys(grouped).map(mode => ({
       name: mode.charAt(0).toUpperCase() + mode.slice(1),
-      value: grouped[mode]
+      value: grouped[mode],
+      percent: total > 0 ? ((grouped[mode] / total) * 100).toFixed(1) : 0
     }));
   }, [payments]);
   
@@ -206,12 +209,12 @@ function FeesPage() {
           <div className="dashboard-grid mb-4">
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Total Collected</p>
-              <h3 className="stat-value text-success">₹{collected.toLocaleString()}</h3>
+              <h3 className="stat-value text-success">{formatINR(collected)}</h3>
               <div className="small text-muted mt-2">↑ 12% vs last month</div>
             </div>
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Expected</p>
-              <h3 className="stat-value">₹{expected.toLocaleString()}</h3>
+              <h3 className="stat-value">{formatINR(expected)}</h3>
               <div className="progress mt-3" style={{ height: '6px' }}>
                 <div className="progress-bar bg-primary" style={{ width: `${collectionEfficiency}%` }}></div>
               </div>
@@ -223,7 +226,7 @@ function FeesPage() {
             </div>
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Pending</p>
-              <h3 className="stat-value text-danger">₹{pending.toLocaleString()}</h3>
+              <h3 className="stat-value text-danger">{formatINR(pending)}</h3>
               <div className="small text-muted mt-2">{filteredPayments.length} pending items</div>
             </div>
           </div>
@@ -261,7 +264,17 @@ function FeesPage() {
                         {modeData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                       </Pie>
                       <RechartsTooltip content={<CustomTooltip />} />
-                      <Legend verticalAlign="bottom" align="center" iconType="circle" />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        align="center" 
+                        iconType="circle" 
+                        formatter={(value, entry) => (
+                          <span style={{ color: 'var(--text)', fontSize: '0.78rem', fontWeight: '500' }}>
+                            {value}: <span style={{ color: entry.color, fontWeight: '700', marginLeft: '4px' }}>{entry.payload.percent}%</span>
+                            <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginLeft: '6px' }}>({formatINR(entry.payload.value)})</span>
+                          </span>
+                        )}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -302,7 +315,7 @@ function FeesPage() {
                           {p.payment_mode.toUpperCase()}
                         </span>
                       </td>
-                      <td className="fw-bold text-primary">&#8377;{Number(p.amount).toLocaleString()}</td>
+                      <td className="fw-bold text-primary">{formatINR(p.amount)}</td>
                       <td>
                         <button
                           className="btn btn-sm rounded-pill px-3"
