@@ -22,10 +22,17 @@ A professional, enterprise-grade management system for educational institutions.
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js (v14+)
-- Python (v3.8+)
+- Node.js (v18+)
+- Python (v3.11+)
 
-### Backend Setup
+### Quick Start (Recommended)
+You can start the entire application (both frontend and backend) with a single command from the root directory. This script automatically handles migrations, initial data seeding, and superuser creation:
+```bash
+python run.py
+```
+*Note: The default superuser created is `admin` with password `admin` (Owner role).*
+
+### Manual Backend Setup
 1. Navigate to the `backend` directory:
    ```bash
    cd backend
@@ -48,7 +55,7 @@ A professional, enterprise-grade management system for educational institutions.
    python manage.py runserver
    ```
 
-### Frontend Setup
+### Manual Frontend Setup
 1. Navigate to the root directory:
    ```bash
    npm install

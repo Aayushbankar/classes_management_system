@@ -31,14 +31,17 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Create Default Admin User
+### 5. Create Default Owner User
 ```bash
 python manage.py create_default_admin
 ```
 
-This creates a superuser with credentials:
+This creates a superuser (with the **owner** role on first run) with credentials:
 - **Username:** `admin`
 - **Password:** `admin`
+- **Role:** `owner`
+
+*Note: If you run the project from the root directory using `python run.py`, migrations, admin creation, and initial data seeding are handled automatically.*
 
 ### 6. Run Development Server
 ```bash

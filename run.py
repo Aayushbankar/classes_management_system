@@ -32,6 +32,8 @@ def run_backend_setup(backend_path, python_exe):
     commands = [
         [python_exe, 'manage.py', 'makemigrations', '--noinput'],
         [python_exe, 'manage.py', 'migrate', '--noinput'],
+        [python_exe, 'manage.py', 'create_default_admin'],
+        [python_exe, 'manage.py', 'seed_initial_data'],
     ]
 
     for cmd in commands:
