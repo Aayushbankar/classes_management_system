@@ -15,6 +15,7 @@ from .serializers import (
     UserManagementSerializer,
     LoginResponseSerializer,
     ChangePasswordSerializer,
+    ProfileUpdateSerializer,
 )
 
 
@@ -190,13 +191,14 @@ def user_profile_view(request):
 @permission_classes([IsAuthenticated])
 def update_profile_view(request):
     """
-    Update user profile information
+    Update user profile information. 
+    Strictly limited to non-sensitive fields.
     """
     user = request.user
-    serializer = UserSerializer(user, data=request.data, partial=True)
+    serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

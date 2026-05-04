@@ -1,0 +1,15 @@
+t=2026-05-04T14:08:33+0530 lvl=info msg="no configuration paths supplied"
+t=2026-05-04T14:08:33+0530 lvl=info msg="using configuration at default config path" path=/home/legion/.config/ngrok/ngrok.yml
+t=2026-05-04T14:08:33+0530 lvl=info msg="open config file" path=/home/legion/.config/ngrok/ngrok.yml err=nil
+t=2026-05-04T14:08:33+0530 lvl=info msg="FIPS 140 mode" enabled=false
+t=2026-05-04T14:08:33+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2026-05-04T14:08:33+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-05-04T14:08:33+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-05-04T14:08:33+0530 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:8000 url=https://flick-stipulate-oboe.ngrok-free.dev
+t=2026-05-04T14:08:44+0530 lvl=info msg=start pg=/api/tunnels id=1feba1e5ba6d67eb
+t=2026-05-04T14:08:44+0530 lvl=info msg=end pg=/api/tunnels id=1feba1e5ba6d67eb status=200 dur=322.019µs
+t=2026-05-04T14:09:49+0530 lvl=info msg="join connections" obj=join id=e46dfdbbbb12 l=127.0.0.1:8000 r=[2409:40c1:4:cd4b:8000::]:38700
+t=2026-05-04T14:10:51+0530 lvl=info msg="join connections" obj=join id=c1691e2bd723 l=127.0.0.1:8000 r=117.198.164.246:62419
+t=2026-05-04T14:13:59+0530 lvl=info msg="join connections" obj=join id=424c79c58749 l=127.0.0.1:8000 r=117.198.164.246:62605
+t=2026-05-04T14:14:49+0530 lvl=info msg="received stop request" obj=app stopReq="{err:<nil> restart:false}"
+t=2026-05-04T14:14:49+0530 lvl=info msg="session closing" obj=tunnels.session err=nil

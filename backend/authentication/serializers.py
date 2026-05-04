@@ -13,9 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'username', 'email', 'first_name', 'last_name', 'role',
-            'branch_id', 'branch_name', 'created_at',
+            'branch_id', 'branch_name', 'is_superuser', 'created_at',
         )
-        read_only_fields = ('id', 'created_at')
+        read_only_fields = ('id', 'created_at', 'is_superuser')
 
 
 class UserManagementSerializer(serializers.ModelSerializer):
@@ -29,8 +29,8 @@ class UserManagementSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'role', 'branch', 'password', 'password_confirm',
         )
+        read_only_fields = ('id', 'role')  # Role can only be changed by superuser/owner in perform_update
         extra_kwargs = {
-            'role': {'required': False},
             'branch': {'required': False, 'allow_null': True},
         }
 
@@ -129,3 +129,8 @@ class ChangePasswordSerializer(serializers.Serializer):
         if data['new_password'] != data['new_password_confirm']:
             raise serializers.ValidationError({'new_password': "Passwords don't match."})
         return data
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')

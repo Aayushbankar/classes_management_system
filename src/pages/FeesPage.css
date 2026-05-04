@@ -13,6 +13,16 @@
   gap: 20px;
 }
 
+@media (max-width: 480px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .kpi-card { padding: 16px; }
+  .kpi-value { font-size: 1.5rem; }
+  .kpi-title { font-size: 0.8rem; }
+}
+
 .kpi-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -105,6 +115,15 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .excel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 8px;
+  }
 }
 
 .excel-search {
@@ -200,6 +219,18 @@
   font-size: 0.9rem;
   color: var(--text);
   min-width: 150px;
+  min-height: 40px;
+}
+
+@media (max-width: 480px) {
+  .filter-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .filter-bar select {
+    width: 100%;
+    min-width: auto;
+  }
 }
 
 .filter-bar select:focus {

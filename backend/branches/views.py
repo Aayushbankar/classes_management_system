@@ -16,7 +16,7 @@ class BranchManagePermission(BasePermission):
             return True
         if request.user.is_superuser or getattr(request.user, 'role', None) in ['owner', 'admin']:
             return True
-        if request.method in ['PUT', 'PATCH'] and getattr(request.user, 'role', None) == 'branch_manager':
+        if request.method in ['PUT', 'PATCH'] and getattr(request.user, 'role', None) == 'admin':
             return request.user.branch_id == obj.id
         return False
 

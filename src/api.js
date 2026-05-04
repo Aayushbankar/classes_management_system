@@ -53,7 +53,10 @@ export async function fetchJson(path, options = {}) {
       ...(options.headers || {}),
     },
   });
-  handle401(response);
+  const result = await handle401(response);
+  if (result === 'retried') {
+    return fetchJson(path, options);
+  }
 
   const text = await response.text();
   let data;

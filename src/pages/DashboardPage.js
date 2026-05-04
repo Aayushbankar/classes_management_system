@@ -63,9 +63,9 @@ function DashboardPage() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-4">
+      <div className="mb-3">
         <p className="subtitle">Overview</p>
-        <h2 className="fs-1">Analytics Dashboard</h2>
+        <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.2rem)' }}>Analytics Dashboard</h2>
       </div>
 
       {error && <div className="alert alert-danger rounded-pill px-4">{error}</div>}
@@ -105,15 +105,15 @@ function DashboardPage() {
 
       <div className="row mt-4 g-4">
         <div className="col-12 col-xl-8">
-          <div className="glass-card" style={{ height: '400px' }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="glass-card" style={{ height: 'clamp(280px, 40vw, 400px)' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="fs-5">Weekly Revenue Trend</h3>
               <select className="form-select form-select-sm w-auto border-0 bg-light rounded-pill">
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
               </select>
             </div>
-            <div style={{ width: '100%', height: '300px' }}>
+            <div style={{ width: '100%', height: 'calc(100% - 60px)' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData}>
                   <defs>
@@ -136,8 +136,8 @@ function DashboardPage() {
         </div>
 
         <div className="col-12 col-xl-4">
-          <div className="glass-card" style={{ height: '400px' }}>
-            <h3 className="fs-5 mb-4">Collection Rate</h3>
+          <div className="glass-card" style={{ height: 'clamp(280px, 40vw, 400px)' }}>
+            <h3 className="fs-5 mb-3">Collection Rate</h3>
             <div className="d-flex flex-column align-items-center justify-content-center h-75">
               <div style={{ width: '100%', height: '200px', position: 'relative' }}>
                 <ResponsiveContainer width="100%" height="100%">

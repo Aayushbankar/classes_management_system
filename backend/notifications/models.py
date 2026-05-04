@@ -9,9 +9,9 @@ class Notification(models.Model):
     ]
 
     TARGET_ROLES = [
+        ('owner', 'Owner'),
         ('admin', 'Admin'),
-        ('branch_manager', 'Branch Manager'),
-        ('staff', 'Staff'),
+        ('assistant', 'Assistant'),
         ('all', 'All Users'),
     ]
 

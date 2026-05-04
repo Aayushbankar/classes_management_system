@@ -30,10 +30,8 @@ def run_backend_setup(backend_path, python_exe):
     env['PYTHONUNBUFFERED'] = '1'
 
     commands = [
-        [python_exe, 'manage.py', 'makemigrations', '--noinput'],
         [python_exe, 'manage.py', 'migrate', '--noinput'],
-        [python_exe, 'manage.py', 'create_default_admin'],
-        [python_exe, 'manage.py', 'seed_initial_data'],
+        [python_exe, 'manage.py', 'initialize_system'],
     ]
 
     for cmd in commands:
