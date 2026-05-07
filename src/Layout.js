@@ -11,14 +11,15 @@ function Layout() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [theme, setTheme] = useState(() => localStorage.getItem("eklavya-theme") || "default");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
   const commandInputRef = useRef(null);
 
-  // Close drawer on route change
-  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
+  // Close drawer/more on route change
+  useEffect(() => { setDrawerOpen(false); setShowMore(false); }, [location.pathname]);
 
   // A4: Silently re-validate role from server on app load
   useEffect(() => {
@@ -49,16 +50,27 @@ function Layout() {
     }
   };
 
-  const pages = [
+  // Primary bottom tabs
+  const bottomTabs = [
     { name: "Dashboard", path: "dashboard", icon: "📊" },
     { name: "Students", path: "students", icon: "🎓" },
-    { name: "Teachers", path: "teachers", icon: "👩‍🏫" },
-    { name: "Timetable", path: "timetable", icon: "📅" },
     { name: "Fees", path: "fees", icon: "💰" },
+    { name: "Timetable", path: "timetable", icon: "📅" },
+  ];
+
+  // "More" menu items
+  const morePages = [
+    { name: "Teachers", path: "teachers", icon: "👩‍🏫" },
     { name: "Reports", path: "reports", icon: "📈" },
     { name: "Branches", path: "branches", icon: "🏢" },
     { name: "Notifications", path: "notifications", icon: "🔔" },
     { name: "Profile", path: "profile", icon: "👤" },
+  ];
+
+  // All pages for sidebar and command palette
+  const pages = [
+    ...bottomTabs,
+    ...morePages,
   ];
 
   const themeOptions = [
@@ -79,6 +91,7 @@ function Layout() {
       if (e.key === 'Escape') {
         setShowCommandPalette(false);
         setDrawerOpen(false);
+        setShowMore(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -113,21 +126,12 @@ function Layout() {
     page.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Hamburger SVG icon
-  const HamburgerIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  );
+  // Current page title for mobile header
+  const currentPage = pages.find(p => location.pathname.includes(p.path));
+  const pageTitle = currentPage?.name || "Eklavya";
 
-  const CloseIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
+  // Check if "More" tab should be highlighted
+  const isMoreActive = morePages.some(p => location.pathname.includes(p.path));
 
   return (
     <div className="app-shell">
@@ -175,7 +179,7 @@ function Layout() {
         </div>
       </aside>
 
-      {/* Mobile Header with Hamburger */}
+      {/* Mobile Header — Frosted glass with centered title */}
       <header className="app-navbar d-flex d-lg-none align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-2">
           <button 
@@ -185,7 +189,7 @@ function Layout() {
           >
             {drawerOpen ? <CloseIcon /> : <HamburgerIcon />}
           </button>
-          <h2 className="fs-6 m-0 gradient-text" style={{ fontWeight: 800 }}>Eklavya</h2>
+          <span className="page-title-mobile gradient-text">{pageTitle}</span>
         </div>
         <div className="d-flex align-items-center gap-3">
           <button className="hamburger-btn" onClick={() => setShowCommandPalette(true)} aria-label="Search">
@@ -256,9 +260,9 @@ function Layout() {
         <Outlet />
       </main>
 
-      {/* Mobile Bottom Nav */}
+      {/* Mobile Bottom Tab Bar — Native feel */}
       <nav className="mobile-bottom-nav d-lg-none">
-        {pages.slice(0, 5).map((page) => (
+        {bottomTabs.map((page) => (
           <NavLink
             key={page.path}
             to={page.path}
@@ -268,7 +272,82 @@ function Layout() {
             <span>{page.name}</span>
           </NavLink>
         ))}
+        {/* More tab */}
+        <button
+          className={`bottom-nav-item ${isMoreActive ? 'active' : ''}`}
+          onClick={() => setShowMore(true)}
+          style={{ background: 'none', border: 'none' }}
+        >
+          <span className="bnav-icon">⋯</span>
+          <span>More</span>
+        </button>
       </nav>
+
+      {/* "More" Bottom Sheet */}
+      {showMore && (
+        <>
+          <div className="mobile-sheet-overlay" onClick={() => setShowMore(false)} />
+          <div className="mobile-sheet">
+            <div className="mobile-sheet-handle" />
+            <div className="mobile-sheet-header">
+              <h3>More</h3>
+              <button className="mobile-sheet-close" onClick={() => setShowMore(false)}>✕</button>
+            </div>
+            <div className="mobile-sheet-body">
+              <div className="more-menu-grid">
+                {morePages.map(page => (
+                  <NavLink
+                    key={page.path}
+                    to={page.path}
+                    className={({ isActive }) => `more-menu-item ${isActive ? 'active' : ''}`}
+                    onClick={() => setShowMore(false)}
+                  >
+                    <span className="more-icon">{page.icon}</span>
+                    <span>{page.name}</span>
+                    {page.name === "Notifications" && unreadCount > 0 && (
+                      <Badge bg="danger" pill style={{ fontSize: '0.55rem', position: 'absolute', top: 6, right: 6 }}>{unreadCount}</Badge>
+                    )}
+                  </NavLink>
+                ))}
+                {canManageUsers() && (
+                  <NavLink
+                    to="users"
+                    className={({ isActive }) => `more-menu-item ${isActive ? 'active' : ''}`}
+                    onClick={() => setShowMore(false)}
+                  >
+                    <span className="more-icon">👥</span>
+                    <span>Users</span>
+                  </NavLink>
+                )}
+              </div>
+
+              <div className="mt-3">
+                <p className="filter-label mb-2">Appearance</p>
+                <div className="theme-picker">
+                  {themeOptions.map(t => (
+                    <button 
+                      key={t.value}
+                      className={`theme-chip ${theme === t.value ? 'active' : ''}`}
+                      onClick={() => setTheme(t.value)}
+                    >
+                      <span>{t.icon}</span>
+                      <span>{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button 
+                className="btn btn-link p-0 mt-3 fw-semibold" 
+                style={{ color: 'var(--danger)', fontSize: '0.85rem' }} 
+                onClick={handleLogout}
+              >
+                🚪 Sign out
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Command Palette Modal */}
       {showCommandPalette && (
@@ -335,5 +414,21 @@ function Layout() {
     </div>
   );
 }
+
+// SVG Icons
+const HamburgerIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
 
 export default Layout;

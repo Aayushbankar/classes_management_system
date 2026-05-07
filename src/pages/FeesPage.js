@@ -32,6 +32,8 @@ function FeesPage() {
   const [filterBranch, setFilterBranch] = useState('');
   const [filterBatch, setFilterBatch] = useState('');
   const [filterStandard, setFilterStandard] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [printPayment, setPrintPayment] = useState(null);
   
   const standards = ['All Classes', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
   const admin = isAdmin();
@@ -42,7 +44,6 @@ function FeesPage() {
       const standardMatch = !filterStandard || filterStandard === 'All Classes' || s.standard === filterStandard;
       return branchMatch && standardMatch;
     });
-
     return Array.from(new Set(selectedStudents.map(s => s.batch_time).filter(Boolean))).sort((a, b) => a.localeCompare(b));
   }, [students, filterBranch, filterStandard]);
 
@@ -53,9 +54,7 @@ function FeesPage() {
     { value: 'other', label: 'Other' },
   ];
 
-  const sortPayments = (items) => {
-    return [...items].sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
-  };
+  const sortPayments = (items) => [...items].sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
 
   const load = () => {
     let query = '?';
@@ -66,11 +65,7 @@ function FeesPage() {
     fetchList(`/finance/payments/${query}`)
       .then(data => setPayments(sortPayments(data)))
       .catch(e => setError(e.message));
-
-    fetchJson(`/reports/fees/${query}`)
-      .then(setFeesData)
-      .catch(() => {});
-
+    fetchJson(`/reports/fees/${query}`).then(setFeesData).catch(() => {});
     fetchList('/students/').then(setStudents).catch(() => {});
     fetchList('/branches/').then(setBranches).catch(() => {});
   };
@@ -132,41 +127,54 @@ function FeesPage() {
 
   const updateField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const [showFilters, setShowFilters] = useState(false);
-  const [printPayment, setPrintPayment] = useState(null);
-
   return (
-    <div className="animate-fade-in dashboard-shell">
-      <div className="analysis-header">
+    <div className="animate-fade-in">
+      <div className="mobile-page-header d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
         <div>
-          <p className="subtitle">Finance Analysis</p>
-          <h2 className="fs-1">Revenue Dashboard</h2>
+          <p className="subtitle">Finance</p>
+          <h2>Revenue</h2>
         </div>
-        <div className="d-flex gap-2 flex-wrap">
-          <button className="btn btn-outline-primary d-lg-none rounded-pill px-4" onClick={() => setShowFilters(!showFilters)}>
-            {showFilters ? '✕ Close Filters' : '🔍 Filter Data'}
+        <div className="d-flex gap-2">
+          <button className="d-lg-none btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.78rem' }} onClick={() => setShowFilters(true)}>
+            🔍 Filters
           </button>
-          <button
-            className="btn rounded-pill px-4"
-            style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem' }}
-            onClick={() => exportToExcel(filteredPayments, PAYMENT_COLS, 'fee_payments')}
-          >
+          <button className="btn btn-sm rounded-pill px-3 d-none d-lg-inline-flex" style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.78rem' }} onClick={() => exportToExcel(filteredPayments, PAYMENT_COLS, 'fee_payments')}>
             ⬇ Export
           </button>
-          {admin && (
-            <button className="btn btn-premium pulse-primary" onClick={() => setModal(true)}>
-              + Record Payment
-            </button>
-          )}
+          {admin && <button className="btn btn-premium d-none d-lg-inline-flex" onClick={() => setModal(true)}>+ Record</button>}
         </div>
       </div>
 
-      <div className="row g-4">
-        {/* Left Sidebar Filters - Power BI Style */}
-        <div className="col-12 col-lg-3">
-          <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
-            <h4 className="fs-6 m-0">Slicers & Filters</h4>
-            
+      {error && <div className="error-box mb-3">{error}</div>}
+
+      {/* KPI Strip */}
+      <div className="kpi-scroll-strip mb-3">
+        <div className="glass-card stat-card">
+          <p className="filter-label m-0">Collected</p>
+          <h3 className="stat-value text-success">{formatINR(collected)}</h3>
+        </div>
+        <div className="glass-card stat-card">
+          <p className="filter-label m-0">Expected</p>
+          <h3 className="stat-value">{formatINR(expected)}</h3>
+          <div className="progress mt-2" style={{ height: '4px' }}>
+            <div className="progress-bar bg-primary" style={{ width: `${collectionEfficiency}%` }}></div>
+          </div>
+        </div>
+        <div className="glass-card stat-card">
+          <p className="filter-label m-0">Efficiency</p>
+          <h3 className="stat-value">{collectionEfficiency}%</h3>
+        </div>
+        <div className="glass-card stat-card">
+          <p className="filter-label m-0">Pending</p>
+          <h3 className="stat-value text-danger">{formatINR(pending)}</h3>
+        </div>
+      </div>
+
+      <div className="row g-3">
+        {/* Desktop Sidebar Filters */}
+        <div className="col-12 col-lg-3 d-none d-lg-block">
+          <div className="filter-pane" style={{ position: 'sticky', top: '1rem' }}>
+            <h4 className="fs-6 m-0">Filters</h4>
             <div className="filter-group">
               <label className="filter-label">Branch</label>
               <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
@@ -174,68 +182,33 @@ function FeesPage() {
                 {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-
             <div className="filter-group">
-              <label className="filter-label">Class / Standard</label>
+              <label className="filter-label">Standard</label>
               <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
                 {standards.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-
             {batchOptions.length > 0 && (
               <div className="filter-group">
-                <label className="filter-label">Batch Time</label>
+                <label className="filter-label">Batch</label>
                 <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
                   <option value="">All Batches</option>
                   {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
             )}
-
-            <div className="mt-2">
-              <input 
-                type="text" 
-                className="input-premium py-2" 
-                placeholder="🔍 Search Student..." 
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
+            <input type="text" className="input-premium py-2" placeholder="🔍 Search…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
           </div>
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Content */}
         <div className="col-12 col-lg-9">
-          <div className="dashboard-grid mb-4">
-            <div className="glass-card stat-card hover-lift">
-              <p className="filter-label m-0">Total Collected</p>
-              <h3 className="stat-value text-success">{formatINR(collected)}</h3>
-              <div className="small text-muted mt-2">↑ 12% vs last month</div>
-            </div>
-            <div className="glass-card stat-card hover-lift">
-              <p className="filter-label m-0">Expected</p>
-              <h3 className="stat-value">{formatINR(expected)}</h3>
-              <div className="progress mt-3" style={{ height: '6px' }}>
-                <div className="progress-bar bg-primary" style={{ width: `${collectionEfficiency}%` }}></div>
-              </div>
-            </div>
-            <div className="glass-card stat-card hover-lift">
-              <p className="filter-label m-0">Efficiency</p>
-              <h3 className="stat-value">{collectionEfficiency}%</h3>
-              <p className="small text-muted mt-2">Target: 95%</p>
-            </div>
-            <div className="glass-card stat-card hover-lift">
-              <p className="filter-label m-0">Pending</p>
-              <h3 className="stat-value text-danger">{formatINR(pending)}</h3>
-              <div className="small text-muted mt-2">{filteredPayments.length} pending items</div>
-            </div>
-          </div>
-
-          <div className="row g-4 mb-4">
+          {/* Charts row */}
+          <div className="row g-3 mb-3">
             <div className="col-12 col-xl-8">
-              <div className="glass-card" style={{ height: '400px' }}>
-                <h3 className="fs-5 mb-4">Revenue Collection Timeline</h3>
-                <div style={{ width: '100%', height: '300px' }}>
+              <div className="glass-card" style={{ minHeight: '280px' }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }} className="mb-3">Revenue Timeline</h3>
+                <div style={{ width: '100%', height: '200px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={timelineData}>
                       <defs>
@@ -245,33 +218,29 @@ function FeesPage() {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={v => `₹${v/1000}K`} />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} tickFormatter={v => `₹${v/1000}K`} />
                       <RechartsTooltip content={<CustomTooltip />} />
-                      <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
+                      <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorAmt)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </div>
             </div>
             <div className="col-12 col-xl-4">
-              <div className="glass-card" style={{ height: '400px' }}>
-                <h3 className="fs-5 mb-4">Payment Modes</h3>
-                <div style={{ width: '100%', height: '260px' }}>
+              <div className="glass-card" style={{ minHeight: '280px' }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }} className="mb-3">Payment Modes</h3>
+                <div style={{ width: '100%', height: '200px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={modeData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                      <Pie data={modeData} innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
                         {modeData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                       </Pie>
                       <RechartsTooltip content={<CustomTooltip />} />
-                      <Legend 
-                        verticalAlign="bottom" 
-                        align="center" 
-                        iconType="circle" 
+                      <Legend verticalAlign="bottom" align="center" iconType="circle" 
                         formatter={(value, entry) => (
-                          <span style={{ color: 'var(--text)', fontSize: '0.78rem', fontWeight: '500' }}>
-                            {value}: <span style={{ color: entry.color, fontWeight: '700', marginLeft: '4px' }}>{entry.payload.percent}%</span>
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginLeft: '6px' }}>({formatINR(entry.payload.value)})</span>
+                          <span style={{ color: 'var(--text)', fontSize: '0.72rem', fontWeight: '500' }}>
+                            {value} <span style={{ color: entry.color, fontWeight: '700' }}>{entry.payload.percent}%</span>
                           </span>
                         )}
                       />
@@ -282,27 +251,26 @@ function FeesPage() {
             </div>
           </div>
 
-          <div className="glass-card">
-            <h3 className="fs-4 mb-4">Transaction Ledger</h3>
+          {/* Mobile search */}
+          <div className="d-lg-none mobile-search-bar mb-2">
+            <input placeholder="Search transactions…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+          </div>
+
+          {/* Transaction list — Desktop table */}
+          <div className="glass-card d-none d-md-block">
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }} className="mb-3">Transactions</h3>
             <div className="data-grid-container">
               <table className="data-grid-table">
                 <thead>
                   <tr>
-                    <th>Student</th>
-                    <th>Branch &amp; Batch</th>
-                    <th>Date</th>
-                    <th>Mode</th>
-                    <th>Amount</th>
-                    <th>Receipt</th>
+                    <th>Student</th><th>Branch</th><th>Date</th><th>Mode</th><th>Amount</th><th>Receipt</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPayments.map(p => (
                     <tr key={p.id}>
                       <td data-label="Student">
-                        <Link to={`/app/students/${p.student}`} className="text-decoration-none fw-semibold">
-                          {p.student_name || p.student}
-                        </Link>
+                        <Link to={`/app/students/${p.student}`} className="text-decoration-none fw-semibold">{p.student_name || p.student}</Link>
                         <div className="small text-muted">{p.student_standard}</div>
                       </td>
                       <td data-label="Branch">
@@ -311,20 +279,12 @@ function FeesPage() {
                       </td>
                       <td data-label="Date"><span className="small">{p.payment_date}</span></td>
                       <td data-label="Mode">
-                        <span className={`badge rounded-pill px-3 py-1 ${p.payment_mode === "cash" ? "bg-success-subtle text-success" : "bg-primary-subtle text-primary"}`}>
-                          {p.payment_mode.toUpperCase()}
-                        </span>
+                        <span className={`badge-mode ${p.payment_mode}`}>{p.payment_mode.toUpperCase()}</span>
                       </td>
                       <td className="fw-bold text-primary">{formatINR(p.amount)}</td>
                       <td>
-                        <button
-                          className="btn btn-sm rounded-pill px-3"
-                          style={{ border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: "0.72rem" }}
-                          onClick={() => { setPrintPayment(p); setTimeout(() => window.print(), 100); }}
-                          title="Print receipt"
-                        >
-                          Print
-                        </button>
+                        <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.72rem' }}
+                          onClick={() => { setPrintPayment(p); setTimeout(() => window.print(), 100); }}>Print</button>
                       </td>
                     </tr>
                   ))}
@@ -332,51 +292,119 @@ function FeesPage() {
               </table>
             </div>
           </div>
+
+          {/* Transaction list — Mobile cards */}
+          <div className="d-md-none">
+            <h3 className="mobile-section-title">Transactions</h3>
+            {filteredPayments.length === 0 && (
+              <div className="text-center py-4" style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No transactions found.</div>
+            )}
+            {filteredPayments.map(p => (
+              <Link key={p.id} to={`/app/students/${p.student}`} className="txn-card text-decoration-none">
+                <div className="txn-card-left">
+                  <div className="txn-name">{p.student_name || p.student}</div>
+                  <div className="txn-meta">{p.student_standard} · {p.payment_date}</div>
+                </div>
+                <div className="txn-card-right">
+                  <div className="txn-amount">{formatINR(p.amount)}</div>
+                  <span className={`badge-mode ${p.payment_mode}`}>{p.payment_mode}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
-      {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(false)}>
-          <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%' }} onClick={e => e.stopPropagation()}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="fs-4">💸 Record New Payment</h3>
-              <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={() => setModal(false)}>&times;</button>
-            </div>
-            
-            <div className="row g-3">
-              <div className="col-12">
-                <label className="small fw-bold text-muted mb-1">Select Student</label>
-                <select className="input-premium" value={form.student} onChange={e => updateField('student', e.target.value)}>
-                  <option value="">Choose Student...</option>
-                  {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.standard})</option>)}
-                </select>
-              </div>
-              <div className="col-12">
-                <label className="small fw-bold text-muted mb-1">Amount Paid (₹)</label>
-                <input type="number" className="input-premium" value={form.amount} onChange={e => updateField('amount', e.target.value)} placeholder="0.00" />
-              </div>
-              <div className="col-md-6">
-                <label className="small fw-bold text-muted mb-1">Date</label>
-                <input type="date" className="input-premium" value={form.payment_date} onChange={e => updateField('payment_date', e.target.value)} />
-              </div>
-              <div className="col-md-6">
-                <label className="small fw-bold text-muted mb-1">Mode</label>
-                <select className="input-premium" value={form.payment_mode} onChange={e => updateField('payment_mode', e.target.value)}>
-                  {paymentModeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                </select>
-              </div>
-              <div className="col-12">
-                <label className="small fw-bold text-muted mb-1">Reference (Optional)</label>
-                <input className="input-premium" value={form.reference} onChange={e => updateField('reference', e.target.value)} placeholder="UPI ID / Cheque No." />
-              </div>
-            </div>
+      {/* FAB for mobile */}
+      {admin && <button className="fab d-lg-none" onClick={() => setModal(true)}>+</button>}
 
-            <button className="btn btn-premium w-100 py-3 mt-4" onClick={handleSave}>Confirm Payment</button>
+      {/* Filter Bottom Sheet (mobile) */}
+      {showFilters && (
+        <>
+          <div className="mobile-sheet-overlay" onClick={() => setShowFilters(false)} />
+          <div className="mobile-sheet">
+            <div className="mobile-sheet-handle" />
+            <div className="mobile-sheet-header">
+              <h3>Filters</h3>
+              <button className="mobile-sheet-close" onClick={() => setShowFilters(false)}>✕</button>
+            </div>
+            <div className="mobile-sheet-body">
+              <div className="filter-group mb-3">
+                <label className="filter-label">Branch</label>
+                <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
+                  <option value="">All Branches</option>
+                  {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div className="filter-group mb-3">
+                <label className="filter-label">Standard</label>
+                <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
+                  {standards.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              {batchOptions.length > 0 && (
+                <div className="filter-group mb-3">
+                  <label className="filter-label">Batch</label>
+                  <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
+                    <option value="">All Batches</option>
+                    {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+            <div className="mobile-sheet-footer">
+              <button className="btn btn-premium w-100 py-3" onClick={() => setShowFilters(false)}>Apply Filters</button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Fee Receipt — hidden in UI, visible during print */}
+      {/* Record Payment Bottom Sheet */}
+      {modal && (
+        <>
+          <div className="mobile-sheet-overlay" onClick={() => setModal(false)} />
+          <div className="mobile-sheet">
+            <div className="mobile-sheet-handle" />
+            <div className="mobile-sheet-header">
+              <h3>💸 Record Payment</h3>
+              <button className="mobile-sheet-close" onClick={() => setModal(false)}>✕</button>
+            </div>
+            <div className="mobile-sheet-body">
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="small fw-bold text-muted mb-1">Select Student</label>
+                  <select className="input-premium" value={form.student} onChange={e => updateField('student', e.target.value)}>
+                    <option value="">Choose Student…</option>
+                    {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.standard})</option>)}
+                  </select>
+                </div>
+                <div className="col-12">
+                  <label className="small fw-bold text-muted mb-1">Amount (₹)</label>
+                  <input type="number" className="input-premium" value={form.amount} onChange={e => updateField('amount', e.target.value)} placeholder="0.00" />
+                </div>
+                <div className="col-6">
+                  <label className="small fw-bold text-muted mb-1">Date</label>
+                  <input type="date" className="input-premium" value={form.payment_date} onChange={e => updateField('payment_date', e.target.value)} />
+                </div>
+                <div className="col-6">
+                  <label className="small fw-bold text-muted mb-1">Mode</label>
+                  <select className="input-premium" value={form.payment_mode} onChange={e => updateField('payment_mode', e.target.value)}>
+                    {paymentModeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                </div>
+                <div className="col-12">
+                  <label className="small fw-bold text-muted mb-1">Reference</label>
+                  <input className="input-premium" value={form.reference} onChange={e => updateField('reference', e.target.value)} placeholder="UPI ID / Cheque No." />
+                </div>
+              </div>
+            </div>
+            <div className="mobile-sheet-footer">
+              <button className="btn btn-premium w-100 py-3" onClick={handleSave}>Confirm Payment</button>
+            </div>
+          </div>
+        </>
+      )}
+
       <FeeReceipt payment={printPayment} student={students.find(s => s.id === printPayment?.student)} />
     </div>
   );

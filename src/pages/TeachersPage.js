@@ -32,38 +32,29 @@ function validateTeacher(form) {
 
 function TeacherCard({ t, admin, onEdit, onDelete }) {
   return (
-    <div className="glass-card mb-2" style={{ padding: '0.9rem 1rem' }}>
+    <div className="mobile-list-card">
       <div className="d-flex justify-content-between align-items-start mb-1">
-        <Link to={`/app/teachers/${t.id}`} className="fw-bold text-decoration-none" style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+        <Link to={`/app/teachers/${t.id}`} className="fw-bold text-decoration-none" style={{ fontSize: '0.92rem', color: 'var(--text)' }}>
           {t.name}
         </Link>
-        <span className="badge rounded-pill px-3" style={{ background: 'var(--primary-soft)', color: 'var(--primary)', fontSize: '0.7rem' }}>
+        <span className="badge rounded-pill px-2" style={{ background: 'var(--primary-soft)', color: 'var(--primary)', fontSize: '0.65rem' }}>
           {t.subject}
         </span>
       </div>
-      <div className="d-flex flex-wrap gap-3 mb-2" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+      <div className="d-flex flex-wrap gap-3 mb-1" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
         {t.assigned_standard && <span>📚 {t.assigned_standard}</span>}
         {t.phone && <span>📞 {t.phone}</span>}
-        {t.email && <span>✉️ {t.email}</span>}
         {t.branch_name && <span>🏢 {t.branch_name}</span>}
       </div>
       {admin && (
         <div className="d-flex gap-2 mt-2">
-          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.75rem' }} onClick={onEdit}>Edit</button>
-          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--danger)', color: 'var(--danger)', fontSize: '0.75rem' }} onClick={onDelete}>Delete</button>
+          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.72rem' }} onClick={onEdit}>Edit</button>
+          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--danger)', color: 'var(--danger)', fontSize: '0.72rem' }} onClick={onDelete}>Delete</button>
         </div>
       )}
     </div>
   );
 }
-
-const Field = ({ label, id, type = 'text', value, onChange, error: fe, placeholder }) => (
-  <div>
-    <label htmlFor={id} className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>{label}</label>
-    <input id={id} type={type} value={value} onChange={onChange} className="input-premium" placeholder={placeholder} style={{ borderColor: fe ? 'var(--danger)' : undefined }} />
-    {fe && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{fe}</span>}
-  </div>
-);
 
 function TeachersPage() {
   const [teachers, setTeachers] = useState([]);
@@ -104,133 +95,117 @@ function TeachersPage() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3">
+      <div className="mobile-page-header d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
         <div>
           <p className="subtitle">Faculty</p>
-          <h2 className="fs-1">Teacher Directory</h2>
+          <h2>Teachers</h2>
         </div>
-        <div className="d-flex gap-2">
-          <button
-            className="btn rounded-pill px-4"
-            style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem' }}
-            onClick={() => exportToExcel(teachers, TEACHER_COLS, 'teachers')}
-          >
+        <div className="d-none d-lg-flex gap-2">
+          <button className="btn rounded-pill px-4" style={{ border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem' }} onClick={() => exportToExcel(teachers, TEACHER_COLS, 'teachers')}>
             ⬇ Export
           </button>
-          {admin && <button className="btn btn-premium" onClick={openAdd}>+ Add New Teacher</button>}
+          {admin && <button className="btn btn-premium" onClick={openAdd}>+ Add Teacher</button>}
         </div>
       </div>
 
       {error && <div className="alert alert-danger rounded-pill px-4 mb-3">{error}</div>}
 
-      <div className="dashboard-grid mb-4">
+      <div className="kpi-scroll-strip mb-3">
         <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'var(--primary-soft)' }}><span>👩‍🏫</span></div>
-          <p className="text-muted small fw-bold m-0">Total Faculty</p>
-          <span className="stat-value">{formatCurrency(teachers.length)}</span>
+          <div className="stat-icon-wrapper" style={{ background: 'var(--primary-soft)', width: 32, height: 32 }}><span style={{fontSize:'0.9rem'}}>👩‍🏫</span></div>
+          <p className="text-muted m-0" style={{fontSize:'0.65rem',fontWeight:700,textTransform:'uppercase'}}>Total Faculty</p>
+          <span className="stat-value">{teachers.length}</span>
         </div>
         <div className="glass-card stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><span>📅</span></div>
-          <p className="text-muted small fw-bold m-0">Active Teachers</p>
-          <span className="stat-value">{formatCurrency(teachers.filter(t => t.is_active !== false).length)}</span>
+          <div className="stat-icon-wrapper" style={{ background: 'rgba(16,185,129,0.1)', width: 32, height: 32 }}><span style={{fontSize:'0.9rem'}}>📅</span></div>
+          <p className="text-muted m-0" style={{fontSize:'0.65rem',fontWeight:700,textTransform:'uppercase'}}>Active</p>
+          <span className="stat-value">{teachers.filter(t => t.is_active !== false).length}</span>
         </div>
       </div>
 
-      <div className="glass-card">
-        <h3 className="fs-5 mb-4">Faculty List</h3>
-
-        {/* Desktop: Table */}
-        <div className="d-none d-md-block">
-          <div className="data-grid-container">
-            <table className="data-grid-table">
-              <thead>
-                <tr>
-                  <th>Teacher</th><th>Subject</th><th>Contact</th><th>Branch</th>
-                  {admin && <th className="text-end">Actions</th>}
+      {/* Desktop Table */}
+      <div className="glass-card d-none d-md-block">
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }} className="mb-3">Faculty List</h3>
+        <div className="data-grid-container">
+          <table className="data-grid-table">
+            <thead><tr><th>Teacher</th><th>Subject</th><th>Contact</th><th>Branch</th>{admin && <th className="text-end">Actions</th>}</tr></thead>
+            <tbody>
+              {teachers.length === 0 && <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No teachers found.</td></tr>}
+              {teachers.map(t => (
+                <tr key={t.id}>
+                  <td className="fw-semibold"><Link to={`/app/teachers/${t.id}`} className="text-decoration-none" style={{ color: 'var(--primary)' }}>{t.name}</Link></td>
+                  <td><span className="badge" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>{t.subject}</span></td>
+                  <td><div className="small fw-medium">{t.email || '—'}</div><div className="small" style={{ color: 'var(--text-muted)' }}>{t.phone || '—'}</div></td>
+                  <td><span className="small">{t.branch_name || '—'}</span></td>
+                  {admin && (<td className="text-end"><button className="btn btn-sm btn-outline-primary rounded-pill me-1" onClick={() => openEdit(t)}>Edit</button><button className="btn btn-sm btn-outline-danger rounded-pill" onClick={() => handleDelete(t.id)}>Del</button></td>)}
                 </tr>
-              </thead>
-              <tbody>
-                {teachers.length === 0 && <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No teachers found in the system.</td></tr>}
-                {teachers.map(t => (
-                  <tr key={t.id}>
-                    <td className="fw-semibold">
-                      <Link to={`/app/teachers/${t.id}`} className="text-decoration-none" style={{ color: 'var(--primary)' }}>
-                        {t.name}
-                      </Link>
-                    </td>
-                    <td><span className="badge" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>{t.subject}</span></td>
-                    <td>
-                      <div className="small fw-medium">{t.email || '—'}</div>
-                      <div className="small" style={{ color: 'var(--text-muted)' }}>{t.phone || '—'}</div>
-                    </td>
-                    <td><span className="small">{t.branch_name || '—'}</span></td>
-                    {admin && (
-                      <td className="text-end">
-                        <button className="btn btn-sm btn-outline-primary rounded-pill me-1" onClick={() => openEdit(t)}>Edit</button>
-                        <button className="btn btn-sm btn-outline-danger rounded-pill" onClick={() => handleDelete(t.id)}>Del</button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Mobile: Cards */}
-        <div className="d-md-none">
-          {teachers.length === 0 && (
-            <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}>
-              <p className="fs-3 mb-1">👩‍🏫</p>
-              <p className="m-0">No teachers found.</p>
-            </div>
-          )}
-          {teachers.map(t => (
-            <TeacherCard key={t.id} t={t} admin={admin} onEdit={() => openEdit(t)} onDelete={() => handleDelete(t.id)} />
-          ))}
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Mobile Cards */}
+      <div className="d-md-none">
+        {teachers.length === 0 && <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}><p className="fs-3 mb-1">👩‍🏫</p><p className="m-0">No teachers found.</p></div>}
+        {teachers.map(t => <TeacherCard key={t.id} t={t} admin={admin} onEdit={() => openEdit(t)} onDelete={() => handleDelete(t.id)} />)}
+      </div>
+
+      {admin && <button className="fab d-lg-none" onClick={openAdd}>+</button>}
+
+      {/* Bottom Sheet Modal */}
       {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(null)}>
-          <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="fs-4">{modal === 'add' ? '✨ Add Teacher' : '📝 Edit Faculty'}</h3>
-              <button className="btn btn-link text-decoration-none fs-4" style={{ color: 'var(--text-primary)' }} onClick={() => setModal(null)}>&times;</button>
+        <>
+          <div className="mobile-sheet-overlay" onClick={() => setModal(null)} />
+          <div className="mobile-sheet">
+            <div className="mobile-sheet-handle" />
+            <div className="mobile-sheet-header">
+              <h3>{modal === 'add' ? '✨ Add Teacher' : '📝 Edit Faculty'}</h3>
+              <button className="mobile-sheet-close" onClick={() => setModal(null)}>✕</button>
             </div>
-            <div className="row g-3">
-              <div className="col-12"><Field label="Full Name *" id="t_name" value={form.name} onChange={e => set('name', e.target.value)} error={formErrors.name} placeholder="e.g. Dr. Sarah Smith" /></div>
-              <div className="col-md-6">
-                <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Subject *</label>
-                <select value={form.subject} onChange={e => set('subject', e.target.value)} className={`input-premium ${formErrors.subject ? 'border-danger' : ''}`}>
-                  <option value="">Select Subject</option>
-                  {TEACHER_SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-                {formErrors.subject && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{formErrors.subject}</span>}
-              </div>
-              <div className="col-md-6">
-                <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Assigned Class</label>
-                <select value={form.assigned_standard} onChange={e => set('assigned_standard', e.target.value)} className="input-premium">
-                  <option value="">Select Class</option>
-                  {TEACHER_STANDARDS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <div className="col-12"><Field label="Email Address" id="t_email" type="email" value={form.email} onChange={e => set('email', e.target.value)} error={formErrors.email} placeholder="sarah@eklavya.edu" /></div>
-              <div className="col-12"><Field label="Phone Number" id="t_phone" value={form.phone} onChange={e => set('phone', e.target.value)} error={formErrors.phone} placeholder="+91 9988776655" /></div>
-              <div className="col-12">
-                <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Branch</label>
-                <select value={form.branch} onChange={e => set('branch', e.target.value)} className="input-premium">
-                  <option value="">Select Branch</option>
-                  {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </select>
+            <div className="mobile-sheet-body">
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Full Name *</label>
+                  <input value={form.name} onChange={e => set('name', e.target.value)} className="input-premium" placeholder="Dr. Sarah Smith" style={{ borderColor: formErrors.name ? 'var(--danger)' : undefined }} />
+                  {formErrors.name && <span style={{ fontSize: '0.72rem', color: 'var(--danger)' }}>{formErrors.name}</span>}
+                </div>
+                <div className="col-6">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Subject *</label>
+                  <select value={form.subject} onChange={e => set('subject', e.target.value)} className={`input-premium ${formErrors.subject ? 'border-danger' : ''}`}>
+                    <option value="">Select</option>
+                    {TEACHER_SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="col-6">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Class</label>
+                  <select value={form.assigned_standard} onChange={e => set('assigned_standard', e.target.value)} className="input-premium">
+                    <option value="">Select</option>
+                    {TEACHER_STANDARDS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="col-12">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Email</label>
+                  <input type="email" value={form.email} onChange={e => set('email', e.target.value)} className="input-premium" placeholder="sarah@eklavya.edu" style={{ borderColor: formErrors.email ? 'var(--danger)' : undefined }} />
+                </div>
+                <div className="col-12">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Phone</label>
+                  <input value={form.phone} onChange={e => set('phone', e.target.value)} className="input-premium" placeholder="+91 9988776655" />
+                </div>
+                <div className="col-12">
+                  <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.72rem' }}>Branch</label>
+                  <select value={form.branch} onChange={e => set('branch', e.target.value)} className="input-premium">
+                    <option value="">Select</option>
+                    {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
               </div>
             </div>
-            <button className="btn btn-premium w-100 py-3 mt-4" onClick={handleSave}>
-              {modal === 'add' ? 'Confirm Appointment' : 'Update Record'}
-            </button>
+            <div className="mobile-sheet-footer">
+              <button className="btn btn-premium w-100 py-3" onClick={handleSave}>{modal === 'add' ? 'Add Teacher' : 'Update'}</button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
