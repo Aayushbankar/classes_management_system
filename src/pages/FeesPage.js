@@ -27,12 +27,12 @@ function FeesPage() {
   const [form, setForm] = useState({ student: '', amount: '', payment_date: '', payment_mode: 'cash', reference: '', notes: '' });
   const [formErrors, setFormErrors] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const [branches, setBranches] = useState([]);
   const [filterBranch, setFilterBranch] = useState('');
   const [filterBatch, setFilterBatch] = useState('');
   const [filterStandard, setFilterStandard] = useState('');
-  
+
   const standards = ['All Classes', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
   const admin = isAdmin();
 
@@ -62,17 +62,17 @@ function FeesPage() {
     if (filterBranch) query += `branch=${filterBranch}&`;
     if (filterStandard && filterStandard !== 'All Classes') query += `standard=${filterStandard}&`;
     if (filterBatch) query += `batch=${encodeURIComponent(filterBatch)}&`;
-    
+
     fetchList(`/finance/payments/${query}`)
       .then(data => setPayments(sortPayments(data)))
       .catch(e => setError(e.message));
 
     fetchJson(`/reports/fees/${query}`)
       .then(setFeesData)
-      .catch(() => {});
+      .catch(() => { });
 
-    fetchList('/students/').then(setStudents).catch(() => {});
-    fetchList('/branches/').then(setBranches).catch(() => {});
+    fetchList('/students/').then(setStudents).catch(() => { });
+    fetchList('/branches/').then(setBranches).catch(() => { });
   };
 
   useEffect(() => { load(); }, [filterBranch, filterStandard, filterBatch]);
@@ -104,13 +104,13 @@ function FeesPage() {
       percent: total > 0 ? ((grouped[mode] / total) * 100).toFixed(1) : 0
     }));
   }, [payments]);
-  
+
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
 
   const filteredPayments = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    return payments.filter(p => 
-      (p.student_name && p.student_name.toLowerCase().includes(q)) || 
+    return payments.filter(p =>
+      (p.student_name && p.student_name.toLowerCase().includes(q)) ||
       (p.reference && p.reference.toLowerCase().includes(q)) ||
       (p.payment_mode && p.payment_mode.toLowerCase().includes(q)) ||
       (p.student_branch_name && p.student_branch_name.toLowerCase().includes(q)) ||
@@ -166,7 +166,7 @@ function FeesPage() {
         <div className="col-12 col-lg-3">
           <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
             <h4 className="fs-6 m-0">Slicers & Filters</h4>
-            
+
             <div className="filter-group">
               <label className="filter-label">Branch</label>
               <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
@@ -193,10 +193,10 @@ function FeesPage() {
             )}
 
             <div className="mt-2">
-              <input 
-                type="text" 
-                className="input-premium py-2" 
-                placeholder="🔍 Search Student..." 
+              <input
+                type="text"
+                className="input-premium py-2"
+                placeholder="🔍 Search Student..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
@@ -236,17 +236,17 @@ function FeesPage() {
               <div className="glass-card" style={{ height: '400px' }}>
                 <h3 className="fs-5 mb-4">Revenue Collection Timeline</h3>
                 <div style={{ width: '100%', height: '300px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="99%" height="100%">
                     <AreaChart data={timelineData}>
                       <defs>
                         <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={v => `₹${v/1000}K`} />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={v => `₹${v / 1000}K`} />
                       <RechartsTooltip content={<CustomTooltip />} />
                       <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
                     </AreaChart>
@@ -258,16 +258,16 @@ function FeesPage() {
               <div className="glass-card" style={{ height: '400px' }}>
                 <h3 className="fs-5 mb-4">Payment Modes</h3>
                 <div style={{ width: '100%', height: '260px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="99%" height="100%">
                     <PieChart>
                       <Pie data={modeData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
                         {modeData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                       </Pie>
                       <RechartsTooltip content={<CustomTooltip />} />
-                      <Legend 
-                        verticalAlign="bottom" 
-                        align="center" 
-                        iconType="circle" 
+                      <Legend
+                        verticalAlign="bottom"
+                        align="center"
+                        iconType="circle"
                         formatter={(value, entry) => (
                           <span style={{ color: 'var(--text)', fontSize: '0.78rem', fontWeight: '500' }}>
                             {value}: <span style={{ color: entry.color, fontWeight: '700', marginLeft: '4px' }}>{entry.payload.percent}%</span>
@@ -342,7 +342,7 @@ function FeesPage() {
               <h3 className="fs-4">💸 Record New Payment</h3>
               <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={() => setModal(false)}>&times;</button>
             </div>
-            
+
             <div className="row g-3">
               <div className="col-12">
                 <label className="small fw-bold text-muted mb-1">Select Student</label>

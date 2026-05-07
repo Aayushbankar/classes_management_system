@@ -86,7 +86,7 @@ function DashboardPage() {
               <h3 className="stat-value m-0">{kpi.value}</h3>
             </div>
             <div style={{ width: '100%', height: '40px', marginTop: '1rem' }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="99%" height="100%">
                 <AreaChart data={trendData}>
                   <Area 
                     type="monotone" 
@@ -114,7 +114,7 @@ function DashboardPage() {
               </select>
             </div>
             <div style={{ width: '100%', height: 'calc(100% - 60px)' }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="99%" height="100%">
                 <AreaChart data={trendData}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -140,7 +140,7 @@ function DashboardPage() {
             <h3 className="fs-5 mb-3">Collection Rate</h3>
             <div className="d-flex flex-column align-items-center justify-content-center h-75">
               <div style={{ width: '100%', height: '200px', position: 'relative' }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieData}

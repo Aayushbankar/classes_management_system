@@ -20,8 +20,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING('--- Eklavya System Initialization ---'))
 
         # 1. Create Default Admin
-        superusers = User.objects.filter(is_superuser=True)
-        if not superusers.exists():
+        if not User.objects.filter(username='admin').exists():
             admin = User.objects.create_superuser(
                 username='admin',
                 email='admin@example.com',
@@ -30,9 +29,9 @@ class Command(BaseCommand):
             if hasattr(admin, 'role'):
                 admin.role = User.ROLE_OWNER
                 admin.save(update_fields=['role'])
-            self.stdout.write(self.style.SUCCESS('✅ Created default owner superuser (admin/admin)'))
+            self.stdout.write(self.style.SUCCESS('Created default owner superuser (admin/admin)'))
         else:
-            self.stdout.write(self.style.WARNING('ℹ️ Superuser already exists. Skipping admin creation.'))
+            self.stdout.write(self.style.WARNING('User "admin" already exists. Skipping admin creation.'))
 
         # 2. Seed Branches
         created_branches = []
@@ -48,9 +47,9 @@ class Command(BaseCommand):
             )
             created_branches.append(branch)
             if created:
-                self.stdout.write(self.style.SUCCESS(f"✅ Created branch: {branch.name}"))
+                self.stdout.write(self.style.SUCCESS(f"Created branch: {branch.name}"))
             else:
-                self.stdout.write(self.style.WARNING(f"ℹ️ Branch exists: {branch.name}"))
+                self.stdout.write(self.style.WARNING(f"Branch exists: {branch.name}"))
 
         # 3. Seed Teachers
         for t_data in TEACHER_TEMPLATES:
@@ -69,7 +68,7 @@ class Command(BaseCommand):
                 }
             )
             if created:
-                self.stdout.write(self.style.SUCCESS(f"✅ Created teacher: {teacher.name}"))
+                self.stdout.write(self.style.SUCCESS(f"Created teacher: {teacher.name}"))
 
         # 4. Create Sample Notification if none exist
         if not Notification.objects.exists():
@@ -81,6 +80,6 @@ class Command(BaseCommand):
                     type='system',
                     target_role='all'
                 )
-            self.stdout.write(self.style.SUCCESS('✅ Created welcome notifications'))
+            self.stdout.write(self.style.SUCCESS('Created welcome notifications'))
 
         self.stdout.write(self.style.SUCCESS('--- Initialization Complete ---'))

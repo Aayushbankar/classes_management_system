@@ -7,15 +7,15 @@ import { formatCurrency } from '../utils/format';
 const emptyTeacher = { name: '', email: '', phone: '', subject: '', assigned_standard: '', branch: '' };
 
 const TEACHER_SUBJECTS = [
-  "Mathematics", "Physics", "Chemistry", "Biology", 
+  "Mathematics", "Physics", "Chemistry", "Biology",
   "Science", "English", "Social Studies", "Hindi", "Marathi",
   "Computer Science / IT", "Accountancy", "Economics", "Business Studies",
   "Physical Education", "Drawing / Art", "Music", "Other"
 ];
 
 const TEACHER_STANDARDS = [
-  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", 
-  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", 
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10",
   "Class 11 (Sci)", "Class 11 (Com)", "Class 11 (Arts)",
   "Class 12 (Sci)", "Class 12 (Com)", "Class 12 (Arts)",
   "NEET", "JEE", "Foundation", "Other"
@@ -49,8 +49,8 @@ function TeacherCard({ t, admin, onEdit, onDelete }) {
       </div>
       {admin && (
         <div className="d-flex gap-2 mt-2">
-          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.75rem' }} onClick={onEdit}>Edit</button>
-          <button className="btn btn-sm rounded-pill px-3" style={{ border: '1px solid var(--danger)', color: 'var(--danger)', fontSize: '0.75rem' }} onClick={onDelete}>Delete</button>
+          <button className="btn btn-sm btn-outline-primary rounded-pill px-3" style={{ fontSize: '0.75rem' }} onClick={onEdit}>Edit</button>
+          <button className="btn btn-sm btn-outline-danger rounded-pill px-3" style={{ fontSize: '0.75rem' }} onClick={onDelete}>Delete</button>
         </div>
       )}
     </div>
@@ -77,7 +77,7 @@ function TeachersPage() {
 
   const load = () => {
     fetchList('/teachers/').then(setTeachers).catch(e => setError(e.message));
-    fetchList('/branches/').then(setBranches).catch(() => {});
+    fetchList('/branches/').then(setBranches).catch(() => { });
   };
   useEffect(() => { load(); }, []);
 

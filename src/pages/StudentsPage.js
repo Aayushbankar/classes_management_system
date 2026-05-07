@@ -4,15 +4,15 @@ import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '..
 import { exportToExcel, STUDENT_COLS } from '../utils/export';
 import { formatINR } from '../utils/format';
 
-const emptyStudent = { 
-  name: '', parent_name: '', contact_number: '', standard: '', batch_time: '', 
-  roll_number: '', branch: '', decided_fee: '0', paid_fee: '0', 
-  status: 'active', payment_mode: 'cash' 
+const emptyStudent = {
+  name: '', parent_name: '', contact_number: '', standard: '', batch_time: '',
+  roll_number: '', branch: '', decided_fee: '0', paid_fee: '0',
+  status: 'active', payment_mode: 'cash'
 };
 
 const STANDARDS = [
-  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", 
-  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", 
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10",
   "Class 11 (Sci)", "Class 11 (Com)", "Class 11 (Arts)",
   "Class 12 (Sci)", "Class 12 (Com)", "Class 12 (Arts)",
   "NEET", "JEE", "Foundation", "Other"
@@ -110,7 +110,7 @@ function StudentsPage() {
     fetchList(`/students/?${params.toString()}`).then(setStudents).catch(e => setError(e.message));
   }, [searchName, searchStandard, searchBranch]);
 
-  useEffect(() => { fetchList('/branches/').then(setBranches).catch(() => {}); }, []);
+  useEffect(() => { fetchList('/branches/').then(setBranches).catch(() => { }); }, []);
   useEffect(() => { const t = setTimeout(loadStudents, 300); return () => clearTimeout(t); }, [loadStudents]);
 
   const activeCount = students.filter(s => s.status === 'active').length;
@@ -252,7 +252,7 @@ function StudentsPage() {
             </div>
             <div className="row g-3">
               <div className="col-12"><Field label="Full Name *" id="s_name" value={form.name} onChange={e => set('name', e.target.value)} error={formErrors.name} placeholder="Student full name" /></div>
-              
+
               <div className="col-md-6">
                 <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Standard / Class</label>
                 <select value={form.standard} onChange={e => set('standard', e.target.value)} className="input-premium">
@@ -271,7 +271,7 @@ function StudentsPage() {
                   {BATCH_TIMES.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
-              
+
               <div className="col-md-6">
                 <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Decided Fee (₹)</label>
                 <input type="number" value={form.decided_fee} onChange={e => set('decided_fee', e.target.value)} className="input-premium" min="0" />
@@ -289,8 +289,8 @@ function StudentsPage() {
                   <label className="small fw-bold mb-1 d-block" style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.72rem' }}>Initial Payment Mode</label>
                   <div className="d-flex gap-2">
                     {['cash', 'upi', 'cheque'].map(mode => (
-                      <button 
-                        key={mode} 
+                      <button
+                        key={mode}
                         className={`btn flex-grow-1 py-2 rounded-pill fw-bold text-uppercase ${form.payment_mode === mode ? 'btn-primary' : 'btn-outline-secondary'}`}
                         style={{ fontSize: '0.75rem' }}
                         onClick={() => set('payment_mode', mode)}

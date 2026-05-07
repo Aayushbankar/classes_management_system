@@ -3,6 +3,6 @@
  * Change the API_URL here to switch between development and production servers
  */
 
-const API_URL = 'http://10.0.2.15:8000/api';
+const API_URL = 'http://127.0.0.1:8000/api';
 
 export default API_URL;
