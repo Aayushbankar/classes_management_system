@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
-import { formatCurrency } from '../utils/format';
+import React, { useEffect, useState, useMemo } from 'react';
+import { fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 
 const emptyBranch = { name: '', code: '', address: '', city: '', is_active: true };
 
@@ -11,6 +10,7 @@ function BranchesPage() {
   const [form, setForm] = useState(emptyBranch);
   const [editId, setEditId] = useState(null);
   const admin = isAdmin();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const load = () => fetchList('/branches/').then(setBranches).catch(e => setError(e.message));
   useEffect(() => { load(); }, []);
@@ -18,11 +18,18 @@ function BranchesPage() {
   const openAdd = () => { setForm(emptyBranch); setEditId(null); setModal('add'); };
   const openEdit = (b) => { setForm({ name: b.name, code: b.code, address: b.address || '', city: b.city || '', is_active: b.is_active !== false }); setEditId(b.id); setModal('edit'); };
 
+  const closeModal = () => {
+    setModal(null);
+    setForm(emptyBranch);
+    setEditId(null);
+    setError('');
+  };
+
   const handleSave = async () => {
     try {
       if (modal === 'add') await postJson('/branches/', form);
       else await putJson(`/branches/${editId}/`, form);
-      setModal(null); load();
+      closeModal(); load();
     } catch (e) { setError(e.message); }
   };
 
@@ -59,7 +66,16 @@ function BranchesPage() {
       </div>
 
       <div className="glass-card">
-        <h3 className="fs-4 mb-4">Branch Registry</h3>
+        <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+          <h3 className="fs-4 m-0">Branch Registry</h3>
+          <input
+            placeholder="🔍 Search branches…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="input-premium py-2"
+            style={{ maxWidth: '260px', flex: '1 1 180px' }}
+          />
+        </div>
         <div className="data-grid-container">
           <table className="data-grid-table">
             <thead>
@@ -72,10 +88,11 @@ function BranchesPage() {
               </tr>
             </thead>
             <tbody>
-              {branches.length === 0 && (
-                <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No branches configured.</td></tr>
-              )}
-              {branches.map(b => (
+              {(() => {
+                const q = searchQuery.toLowerCase();
+                const filtered = branches.filter(b => !q || (b.name && b.name.toLowerCase().includes(q)) || (b.code && b.code.toLowerCase().includes(q)) || (b.city && b.city.toLowerCase().includes(q)) || (b.address && b.address.toLowerCase().includes(q)));
+                if (filtered.length === 0) return <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No branches match your search.</td></tr>;
+                return filtered.map(b => (
                 <tr key={b.id}>
                   <td className="fw-semibold">{b.name}</td>
                   <td><code className="bg-light px-2 py-1 rounded text-primary">{b.code}</code></td>
@@ -92,18 +109,19 @@ function BranchesPage() {
                     </td>
                   )}
                 </tr>
-              ))}
+                ));
+              })()}
             </tbody>
           </table>
         </div>
       </div>
 
       {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(null)}>
+        <div className="command-palette-overlay" onClick={closeModal}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%' }} onClick={e => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fs-4">{modal === 'add' ? '🏢 New Branch' : '📝 Edit Branch'}</h3>
-              <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={() => setModal(null)}>&times;</button>
+              <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={closeModal}>&times;</button>
             </div>
             
             <div className="row g-3">

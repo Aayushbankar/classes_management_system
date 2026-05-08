@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { fetchJson, fetchList, postJson, putJson, deleteJson, getCurrentUser, canManageUsers } from '../api';
+import React, { useEffect, useState, useMemo } from 'react';
+import { fetchList, postJson, putJson, deleteJson, getCurrentUser, canManageUsers } from '../api';
 
 const emptyForm = {
   username: '',
@@ -21,6 +21,7 @@ function UsersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const user = getCurrentUser();
   const allowed = canManageUsers();
@@ -174,7 +175,16 @@ function UsersPage() {
       <div className="panel-section" style={{ marginTop: 20 }}>
         <div className="panel-heading">
           <h3>User List</h3>
-          <button className="btn btn-primary" onClick={openAdd}>+ Add User</button>
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            <input
+              placeholder="🔍 Search users…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="input-premium py-2"
+              style={{ maxWidth: '240px', flex: '1 1 160px' }}
+            />
+            <button className="btn btn-primary" onClick={openAdd}>+ Add User</button>
+          </div>
         </div>
 
         {loading ? (
@@ -192,9 +202,11 @@ function UsersPage() {
               </tr>
             </thead>
             <tbody>
-              {users.length === 0 ? (
-                <tr><td colSpan={6} className="empty-state">No users found</td></tr>
-              ) : users.map(u => (
+              {(() => {
+                const q = searchQuery.toLowerCase();
+                const filtered = users.filter(u => !q || (u.username && u.username.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q)) || (`${u.first_name || ''} ${u.last_name || ''}`.toLowerCase().includes(q)) || (u.role && u.role.toLowerCase().includes(q)) || (u.branch_name && u.branch_name.toLowerCase().includes(q)));
+                if (filtered.length === 0) return <tr><td colSpan={6} className="empty-state">No users match your search.</td></tr>;
+                return filtered.map(u => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
                   <td>{u.email}</td>
@@ -206,7 +218,8 @@ function UsersPage() {
                     <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)} style={{ marginLeft: 8 }}>Delete</button>
                   </td>
                 </tr>
-              ))}
+                ));
+              })()}
             </tbody>
           </table>
         )}

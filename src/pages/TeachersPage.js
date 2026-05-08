@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 import { exportToExcel, TEACHER_COLS } from '../utils/export';
@@ -75,14 +75,40 @@ function TeachersPage() {
   const [editId, setEditId] = useState(null);
   const admin = isAdmin();
 
+  const [searchName, setSearchName] = useState('');
+  const [filterSubject, setFilterSubject] = useState('');
+  const [filterBranch, setFilterBranch] = useState('');
+
   const load = () => {
     fetchList('/teachers/').then(setTeachers).catch(e => setError(e.message));
     fetchList('/branches/').then(setBranches).catch(() => { });
   };
   useEffect(() => { load(); }, []);
 
+  const filteredTeachers = useMemo(() => {
+    const q = searchName.toLowerCase();
+    return teachers.filter(t => {
+      const nameMatch = !q || (t.name && t.name.toLowerCase().includes(q)) || (t.email && t.email.toLowerCase().includes(q)) || (t.phone && t.phone.includes(q));
+      const subjectMatch = !filterSubject || t.subject === filterSubject;
+      const branchMatch = !filterBranch || String(t.branch || t.branch_id) === String(filterBranch);
+      return nameMatch && subjectMatch && branchMatch;
+    });
+  }, [teachers, searchName, filterSubject, filterBranch]);
+
+  const subjectOptions = useMemo(() => {
+    return Array.from(new Set(teachers.map(t => t.subject).filter(Boolean))).sort();
+  }, [teachers]);
+
   const openAdd = () => { setForm({ ...emptyTeacher, branch: branches[0]?.id || '' }); setEditId(null); setFormErrors({}); setModal('add'); };
   const openEdit = (t) => { setForm({ ...t, branch: t.branch || t.branch_id || '' }); setEditId(t.id); setFormErrors({}); setModal('edit'); };
+
+  const closeModal = () => {
+    setModal(null);
+    setForm(emptyTeacher);
+    setEditId(null);
+    setFormErrors({});
+    setError('');
+  };
 
   const handleSave = async () => {
     const errs = validateTeacher(form);
@@ -91,7 +117,7 @@ function TeachersPage() {
     try {
       if (modal === 'add') await postJson('/teachers/', form);
       else await putJson(`/teachers/${editId}/`, form);
-      setModal(null); load();
+      closeModal(); load();
     } catch (e) { setError(e.message); }
   };
 
@@ -137,7 +163,20 @@ function TeachersPage() {
       </div>
 
       <div className="glass-card">
-        <h3 className="fs-5 mb-4">Faculty List</h3>
+        <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+          <h3 className="fs-5 m-0">Faculty List</h3>
+          <div className="d-flex flex-wrap gap-2" style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <input placeholder="Search name / email…" value={searchName} onChange={e => setSearchName(e.target.value)} className="input-premium py-2" style={{ maxWidth: '200px', flex: '1 1 140px' }} />
+            <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="input-premium py-2" style={{ maxWidth: '180px', flex: '1 1 120px' }}>
+              <option value="">All Subjects</option>
+              {subjectOptions.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select value={filterBranch} onChange={e => setFilterBranch(e.target.value)} className="input-premium py-2" style={{ maxWidth: '180px', flex: '1 1 120px' }}>
+              <option value="">All Branches</option>
+              {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+        </div>
 
         {/* Desktop: Table */}
         <div className="d-none d-md-block">
@@ -150,8 +189,8 @@ function TeachersPage() {
                 </tr>
               </thead>
               <tbody>
-                {teachers.length === 0 && <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No teachers found in the system.</td></tr>}
-                {teachers.map(t => (
+                {filteredTeachers.length === 0 && <tr><td colSpan={admin ? 5 : 4} className="text-center py-5 text-muted">No teachers match your criteria.</td></tr>}
+                {filteredTeachers.map(t => (
                   <tr key={t.id}>
                     <td className="fw-semibold">
                       <Link to={`/app/teachers/${t.id}`} className="text-decoration-none" style={{ color: 'var(--primary)' }}>
@@ -179,13 +218,13 @@ function TeachersPage() {
 
         {/* Mobile: Cards */}
         <div className="d-md-none">
-          {teachers.length === 0 && (
+          {filteredTeachers.length === 0 && (
             <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}>
               <p className="fs-3 mb-1">👩‍🏫</p>
-              <p className="m-0">No teachers found.</p>
+              <p className="m-0">No teachers match your criteria.</p>
             </div>
           )}
-          {teachers.map(t => (
+          {filteredTeachers.map(t => (
             <TeacherCard key={t.id} t={t} admin={admin} onEdit={() => openEdit(t)} onDelete={() => handleDelete(t.id)} />
           ))}
         </div>
@@ -193,11 +232,11 @@ function TeachersPage() {
 
       {/* Modal */}
       {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(null)}>
+        <div className="command-palette-overlay" onClick={closeModal}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fs-4">{modal === 'add' ? '✨ Add Teacher' : '📝 Edit Faculty'}</h3>
-              <button className="btn btn-link text-decoration-none fs-4" style={{ color: 'var(--text-primary)' }} onClick={() => setModal(null)}>&times;</button>
+              <button className="btn btn-link text-decoration-none fs-4" style={{ color: 'var(--text-primary)' }} onClick={closeModal}>&times;</button>
             </div>
             <div className="row g-3">
               <div className="col-12"><Field label="Full Name *" id="t_name" value={form.name} onChange={e => set('name', e.target.value)} error={formErrors.name} placeholder="e.g. Dr. Sarah Smith" /></div>

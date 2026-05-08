@@ -4,7 +4,7 @@ import { fetchJson, fetchList, postJson, isAdmin } from '../api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import FeeReceipt from '../components/FeeReceipt';
 import { exportToExcel, PAYMENT_COLS } from '../utils/export';
-import { formatCurrency, formatINR } from '../utils/format';
+import { formatINR } from '../utils/format';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -25,7 +25,9 @@ function FeesPage() {
   const [error, setError] = useState('');
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({ student: '', amount: '', payment_date: '', payment_mode: 'cash', reference: '', notes: '' });
-  const [formErrors, setFormErrors] = useState({});
+  const [studentSearch, setStudentSearch] = useState('');
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const [branches, setBranches] = useState([]);
@@ -57,7 +59,7 @@ function FeesPage() {
     return [...items].sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
   };
 
-  const load = () => {
+  const load = React.useCallback(() => {
     let query = '?';
     if (filterBranch) query += `branch=${filterBranch}&`;
     if (filterStandard && filterStandard !== 'All Classes') query += `standard=${filterStandard}&`;
@@ -73,9 +75,9 @@ function FeesPage() {
 
     fetchList('/students/').then(setStudents).catch(() => { });
     fetchList('/branches/').then(setBranches).catch(() => { });
-  };
+  }, [filterBranch, filterStandard, filterBatch]);
 
-  useEffect(() => { load(); }, [filterBranch, filterStandard, filterBatch]);
+  useEffect(() => { load(); }, [load]);
 
   const collected = feesData ? Number(feesData.total_collected_revenue || 0) : 0;
   const expected = feesData ? Number(feesData.total_expected_revenue || 0) : 0;
@@ -119,13 +121,20 @@ function FeesPage() {
     );
   }, [payments, searchQuery]);
 
+  const closeModal = () => {
+    setModal(false);
+    setForm({ student: '', amount: '', payment_date: '', payment_mode: 'cash', reference: '', notes: '' });
+    setStudentSearch('');
+    setShowStudentDropdown(false);
+    setError('');
+  };
+
   const handleSave = async () => {
     if (!form.student) { setError('Please select a student'); return; }
     if (!form.amount || Number(form.amount) <= 0) { setError('Amount must be greater than 0'); return; }
     try {
       await postJson('/finance/payments/', form);
-      setModal(false);
-      setError('');
+      closeModal();
       load();
     } catch (e) { setError(e.message); }
   };
@@ -336,20 +345,64 @@ function FeesPage() {
       </div>
 
       {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(false)}>
+        <div className="command-palette-overlay" onClick={closeModal}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%' }} onClick={e => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fs-4">💸 Record New Payment</h3>
-              <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={() => setModal(false)}>&times;</button>
+              <button className="btn btn-link text-dark text-decoration-none fs-4" onClick={closeModal}>&times;</button>
             </div>
+            
+            {error && <div className="alert alert-danger mb-3 py-2 small">{error}</div>}
 
             <div className="row g-3">
-              <div className="col-12">
+              <div className="col-12" style={{ position: 'relative' }}>
                 <label className="small fw-bold text-muted mb-1">Select Student</label>
-                <select className="input-premium" value={form.student} onChange={e => updateField('student', e.target.value)}>
-                  <option value="">Choose Student...</option>
-                  {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.standard})</option>)}
-                </select>
+                {form.student ? (
+                  <div className="input-premium d-flex align-items-center justify-content-between" style={{ cursor: 'pointer' }}
+                    onClick={() => { updateField('student', ''); setStudentSearch(''); setShowStudentDropdown(true); }}>
+                    <span className="fw-semibold">{(() => { const s = students.find(s => String(s.id) === String(form.student)); return s ? `${s.name} (${s.standard})` : 'Selected'; })()}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>✕ Change</span>
+                  </div>
+                ) : (
+                  <input
+                    className="input-premium"
+                    placeholder="🔍 Type to search students..."
+                    value={studentSearch}
+                    onChange={e => { setStudentSearch(e.target.value); setShowStudentDropdown(true); }}
+                    onFocus={() => setShowStudentDropdown(true)}
+                    autoComplete="off"
+                  />
+                )}
+                {showStudentDropdown && !form.student && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: '0.75rem', maxHeight: '200px', overflowY: 'auto',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)', marginTop: '4px'
+                  }}>
+                    {students
+                      .filter(s => {
+                        const q = studentSearch.toLowerCase();
+                        return !q || (s.name && s.name.toLowerCase().includes(q)) || (s.standard && s.standard.toLowerCase().includes(q)) || (s.branch_name && s.branch_name.toLowerCase().includes(q));
+                      })
+                      .slice(0, 30)
+                      .map(s => (
+                        <div key={s.id}
+                          className="px-3 py-2"
+                          style={{ cursor: 'pointer', fontSize: '0.88rem', borderBottom: '1px solid var(--border)', transition: 'background 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-soft)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                          onClick={() => { updateField('student', s.id); setStudentSearch(s.name); setShowStudentDropdown(false); }}
+                        >
+                          <span className="fw-semibold">{s.name}</span>
+                          <span className="ms-2 text-muted" style={{ fontSize: '0.76rem' }}>{s.standard} {s.branch_name ? `· ${s.branch_name}` : ''}</span>
+                        </div>
+                      ))}
+                    {students.filter(s => { const q = studentSearch.toLowerCase(); return !q || (s.name && s.name.toLowerCase().includes(q)) || (s.standard && s.standard.toLowerCase().includes(q)); }).length === 0 && (
+                      <div className="px-3 py-3 text-center text-muted" style={{ fontSize: '0.85rem' }}>No students found</div>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="col-12">
                 <label className="small fw-bold text-muted mb-1">Amount Paid (₹)</label>

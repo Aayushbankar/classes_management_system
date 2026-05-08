@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Badge, Form } from "react-bootstrap";
-import { getCurrentUser, clearSession, fetchJson, canManageUsers } from "./api";
+import { clearSession, fetchJson, canManageUsers } from "./api";
 
 function Layout() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -11,10 +11,9 @@ function Layout() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [theme, setTheme] = useState(() => localStorage.getItem("eklavya-theme") || "default");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
-  const user = getCurrentUser();
   const commandInputRef = useRef(null);
 
   // Close drawer on route change
@@ -30,9 +29,9 @@ function Layout() {
           if (parsed.role !== serverProfile.role) {
             localStorage.setItem('user', JSON.stringify({ ...parsed, role: serverProfile.role }));
           }
-        } catch {}
+        } catch { }
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -109,7 +108,7 @@ function Layout() {
     window.location.href = "/";
   };
 
-  const filteredPages = pages.filter(page => 
+  const filteredPages = pages.filter(page =>
     page.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -137,14 +136,14 @@ function Layout() {
           <div style={{ width: 30, height: 30, background: 'var(--primary-gradient)', borderRadius: '8px' }}></div>
           <h2 className="fs-5 m-0 gradient-text" style={{ fontWeight: 800 }}>Eklavya</h2>
         </div>
-        
+
         <nav className="flex-grow-1">
           {pages.map((page) => {
             if (page.name === 'Users' && !canManageUsers()) return null;
             return (
-              <NavLink 
-                key={page.path} 
-                to={page.path} 
+              <NavLink
+                key={page.path}
+                to={page.path}
                 className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
               >
                 <span style={{ fontSize: '1.1rem' }}>{page.icon}</span>
@@ -158,10 +157,10 @@ function Layout() {
         </nav>
 
         <div className="mt-auto pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <Form.Select 
-            size="sm" 
-            value={theme} 
-            onChange={(e) => setTheme(e.target.value)} 
+          <Form.Select
+            size="sm"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
             className="mb-3 rounded-pill px-3 fw-bold"
             style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: '0.8rem' }}
           >
@@ -178,8 +177,8 @@ function Layout() {
       {/* Mobile Header with Hamburger */}
       <header className="app-navbar d-flex d-lg-none align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-2">
-          <button 
-            className="hamburger-btn" 
+          <button
+            className="hamburger-btn"
             onClick={() => setDrawerOpen(!drawerOpen)}
             aria-label="Menu"
           >
@@ -212,9 +211,9 @@ function Layout() {
           {pages.map((page) => {
             if (page.name === 'Users' && !canManageUsers()) return null;
             return (
-              <NavLink 
-                key={page.path} 
-                to={page.path} 
+              <NavLink
+                key={page.path}
+                to={page.path}
                 className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
                 onClick={() => setDrawerOpen(false)}
               >
@@ -232,7 +231,7 @@ function Layout() {
           <p className="filter-label mb-2">Theme</p>
           <div className="theme-picker">
             {themeOptions.map(t => (
-              <button 
+              <button
                 key={t.value}
                 className={`theme-chip ${theme === t.value ? 'active' : ''}`}
                 onClick={() => setTheme(t.value)}
@@ -242,9 +241,9 @@ function Layout() {
               </button>
             ))}
           </div>
-          <button 
-            className="btn btn-link p-0 mt-3 fw-semibold" 
-            style={{ color: 'var(--danger)', fontSize: '0.85rem' }} 
+          <button
+            className="btn btn-link p-0 mt-3 fw-semibold"
+            style={{ color: 'var(--danger)', fontSize: '0.85rem' }}
             onClick={handleLogout}
           >
             🚪 Sign out
@@ -276,24 +275,24 @@ function Layout() {
           <div className="command-palette" onClick={e => e.stopPropagation()}>
             <div className="command-input-wrapper">
               <span className="fs-4">🔍</span>
-              <input 
+              <input
                 ref={commandInputRef}
-                type="text" 
-                placeholder="Search pages, students, records..." 
+                type="text"
+                placeholder="Search pages, students, records..."
                 className="command-input"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
               <Badge bg="light" text="dark" className="border">ESC</Badge>
             </div>
-            
+
             <div className="command-results">
               {filteredPages.length > 0 && (
                 <div className="px-3 py-2 text-muted small fw-bold">PAGES</div>
               )}
               {filteredPages.map(page => (
-                <div 
-                  key={page.path} 
+                <div
+                  key={page.path}
                   className="result-item"
                   onClick={() => {
                     navigate(page.path);
@@ -307,13 +306,13 @@ function Layout() {
               ))}
 
               {isSearching && <div className="p-4 text-center">Searching...</div>}
-              
+
               {!isSearching && globalResults.length > 0 && (
                 <div className="px-3 py-2 text-muted small fw-bold mt-2">DATA</div>
               )}
               {!isSearching && globalResults.map(result => (
-                <div 
-                  key={result.id} 
+                <div
+                  key={result.id}
                   className="result-item"
                   onClick={() => {
                     navigate(result.path);

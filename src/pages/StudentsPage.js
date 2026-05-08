@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchJson, fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
+import { fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 import { exportToExcel, STUDENT_COLS } from '../utils/export';
 import { formatINR } from '../utils/format';
 
@@ -120,6 +120,14 @@ function StudentsPage() {
   const openAdd = () => { setForm({ ...emptyStudent, branch: branches[0]?.id || '', standard: STANDARDS[0] }); setEditId(null); setFormErrors({}); setModal('add'); };
   const openEdit = (s) => { setForm({ ...s, branch: s.branch || s.branch_id || '', payment_mode: 'cash' }); setEditId(s.id); setFormErrors({}); setModal('edit'); };
 
+  const closeModal = () => {
+    setModal(null);
+    setForm(emptyStudent);
+    setEditId(null);
+    setFormErrors({});
+    setError('');
+  };
+
   const handleSave = async () => {
     const errs = validateStudent(form);
     if (Object.keys(errs).length) { setFormErrors(errs); return; }
@@ -127,7 +135,7 @@ function StudentsPage() {
     try {
       if (modal === 'add') await postJson('/students/', form);
       else await putJson(`/students/${editId}/`, form);
-      setModal(null); loadStudents();
+      closeModal(); loadStudents();
     } catch (e) { setError(e.message); }
   };
 
@@ -244,11 +252,11 @@ function StudentsPage() {
       </div>
 
       {modal && (
-        <div className="command-palette-overlay" onClick={() => setModal(null)}>
+        <div className="command-palette-overlay" onClick={closeModal}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fs-4 m-0">{modal === 'add' ? '✨ Add New Student' : '📝 Edit Student Record'}</h3>
-              <button className="btn btn-link text-decoration-none fs-4 p-0 m-0" style={{ color: 'var(--text-primary)', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setModal(null)}>&times;</button>
+              <button className="btn btn-link text-decoration-none fs-4 p-0 m-0" style={{ color: 'var(--text-primary)', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={closeModal}>&times;</button>
             </div>
             <div className="row g-3">
               <div className="col-12"><Field label="Full Name *" id="s_name" value={form.name} onChange={e => set('name', e.target.value)} error={formErrors.name} placeholder="Student full name" /></div>

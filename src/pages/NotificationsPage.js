@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJson, fetchList, postJson } from '../api';
+import { fetchList, postJson } from '../api';
 
 function timeAgo(dateStr) {
   const now = new Date();

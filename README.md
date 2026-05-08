@@ -1,69 +1,160 @@
-# Classes Management System
+<div align="center">
 
-A professional, enterprise-grade management system for educational institutions. Built with a React frontend and a Django REST Framework backend.
+# 🎓 Classes Management System
 
-## 🚀 Features
+**A modern, full-stack management platform for coaching institutes and educational institutions.**
 
-- **Global Search**: Search through students, teachers, and financial records in real-time.
-- **Student Management**: Comprehensive student profiles, enrollment tracking, and performance monitoring.
-- **Teacher Portal**: Manage faculty schedules, departments, and payroll.
-- **Finance Dashboard**: Power BI-style financial visualization for revenue, fees, and expenses.
-- **Branch Management**: Multi-branch support with hierarchical administration.
-- **Timetable & Scheduling**: Dynamic scheduling for classes and exams.
-- **Automated Notifications**: Real-time alerts for fee payments, schedule changes, and more.
+Built with React · Django REST Framework · JWT Authentication
 
-## 🛠️ Technology Stack
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB.svg)](https://python.org)
+[![Node.js 18+](https://img.shields.io/badge/Node.js-18+-339933.svg)](https://nodejs.org)
+[![Django 4.2](https://img.shields.io/badge/Django-4.2-092E20.svg)](https://djangoproject.com)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB.svg)](https://reactjs.org)
 
-- **Frontend**: React, Vanilla CSS, Recharts
-- **Backend**: Django, Django REST Framework
-- **Database**: SQLite (Development) / PostgreSQL (Production)
-- **API**: OpenAPI (Swagger) documented
+</div>
 
-## 📦 Installation
+---
+
+## ✨ Features
+
+- **📊 Revenue Dashboard** — Power BI-style financial analytics with interactive charts, collection efficiency tracking, and payment mode breakdowns
+- **🎓 Student Management** — Full student lifecycle management with enrollment, fee tracking, progress bars, and detailed profiles
+- **👩‍🏫 Teacher Portal** — Faculty management with subject assignments, branch allocation, and contact directory
+- **💰 Fee & Finance** — Record payments, track pending fees, print receipts, and export transaction ledgers
+- **🏢 Multi-Branch Support** — Operate across multiple branches with branch-level data isolation and filtering
+- **📅 Timetable & Scheduling** — Weekly timetable management with teacher conflict detection and batch/standard filtering
+- **🔔 Notifications** — In-app notification system with read/unread state and broadcast support
+- **📈 Reports & Export** — Export data to Excel, generate fee reports, and analyze student/revenue metrics
+- **🔐 Role-Based Access** — Three-tier role system (Owner → Admin → Assistant) with branch-level permissions
+- **🎨 Premium UI** — Glassmorphism design with 4+ switchable themes (Azure, Midnight, Royal Velvet, Crimson Sunset)
+- **🔍 Global Search** — Search across students, teachers, finances, and records with real-time filtering
+- **📱 Mobile-First** — Fully responsive layout with bottom navigation and touch-friendly interactions
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19, Vanilla CSS, Recharts, Bootstrap 5 |
+| **Backend** | Django 4.2, Django REST Framework, SimpleJWT |
+| **Database** | SQLite (dev) / PostgreSQL (prod) |
+| **API Docs** | OpenAPI 3.0 via drf-spectacular (Swagger UI) |
+| **Deployment** | Docker, Docker Compose |
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v18+)
-- Python (v3.11+)
 
-### Quick Start (Recommended)
-You can start the entire application (both frontend and backend) with a single command from the root directory. This script automatically handles migrations, initial data seeding, and superuser creation:
+- [Python 3.11+](https://python.org/downloads/)
+- [Node.js 18+](https://nodejs.org/)
+- Git
+
+### One-Command Start
+
+Clone the repository and start both servers with a single command:
+
 ```bash
+git clone https://github.com/your-username/eklavya-app.git
+cd eklavya-app
+
+# Install frontend dependencies
+npm install
+
+# Set up backend virtual environment
+cd backend
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS/Linux
+pip install -r requirements.txt
+cd ..
+
+# Start everything (migrations, seeding, and both servers)
 python run.py
 ```
-*Note: The default superuser created is `admin` with password `admin` (Owner role).*
 
-### Manual Backend Setup
-1. Navigate to the `backend` directory:
-   ```bash
-   cd backend
-   ```
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run migrations:
-   ```bash
-   python manage.py migrate
-   ```
-5. Start the server:
-   ```bash
-   python manage.py runserver
-   ```
+This will automatically:
+- Run database migrations
+- Create a default admin user
+- Start the Django backend on `http://localhost:8000`
+- Start the React frontend on `http://localhost:3001`
 
-### Manual Frontend Setup
-1. Navigate to the root directory:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm start
-   ```
+### Default Login
 
-## 📝 License
-This project is licensed under the MIT License.
+| Field | Value |
+|-------|-------|
+| Username | `admin` |
+| Password | `admin` |
+| Role | Owner (full access) |
+
+> ⚠️ **Change the default password immediately** in a production environment.
+
+---
+
+## 📖 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Setup Guide](docs/setup.md) | Detailed installation & configuration |
+| [Architecture](docs/architecture.md) | System design & module overview |
+| [API Reference](docs/api-reference.md) | Full REST API documentation |
+| [Frontend Guide](docs/frontend-guide.md) | React components & design system |
+| [Deployment](docs/deployment.md) | Docker & production deployment |
+| [Contributing](docs/contributing.md) | Development guidelines |
+| [Roadmap](docs/roadmap.md) | Feature roadmap & future plans |
+
+Interactive API documentation is also available at `/api/docs/` (Swagger UI) and `/api/redoc/` (ReDoc) when the backend is running.
+
+---
+
+## 📁 Project Structure
+
+```
+eklavya-app/
+├── backend/                    # Django REST API
+│   ├── config/                 # Django settings & URL routing
+│   ├── authentication/         # User model, JWT, roles
+│   ├── branches/               # Branch CRUD & filtering
+│   ├── students/               # Student management
+│   ├── teachers/               # Teacher management
+│   ├── finance/                # Fee payments & ledger
+│   ├── schedule/               # Timetable slots
+│   ├── notifications/          # In-app alerts
+│   ├── reports/                # Dashboard analytics
+│   ├── manage.py
+│   └── requirements.txt
+├── src/                        # React frontend
+│   ├── components/             # Reusable UI components
+│   ├── pages/                  # Route-level page components
+│   ├── utils/                  # Utilities (export, formatting)
+│   ├── App.js                  # Router & app shell
+│   ├── Layout.js               # Navigation & theme system
+│   ├── api.js                  # API client & auth helpers
+│   ├── config.js               # Environment configuration
+│   ├── index.css               # Global styles & design tokens
+│   └── login.js                # Authentication page
+├── docs/                       # Project documentation
+├── public/                     # Static assets
+├── run.py                      # Development server launcher
+├── docker-compose.yml          # Docker orchestration
+├── package.json                # Frontend dependencies
+└── README.md
+```
+
+---
+
+## 🔑 User Roles
+
+| Role | Scope | Capabilities |
+|------|-------|-------------|
+| **Owner** | Global | Full access, manage all branches, create admins |
+| **Admin** | Branch-level | Manage own branch data, create assistants |
+| **Assistant** | Branch-level | View-only access to assigned branch |
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for education</sub>
+</div>

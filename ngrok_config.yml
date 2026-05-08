@@ -1,8 +1,0 @@
-authtoken: YOUR_AUTHTOKEN_HERE
-tunnels:
-  frontend:
-    proto: http
-    addr: 3001
-  backend:
-    proto: http
-    addr: 8000

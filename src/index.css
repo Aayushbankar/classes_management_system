@@ -1773,7 +1773,7 @@ select.input-premium {
 .command-palette-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 2000;
@@ -1803,8 +1803,10 @@ select.input-premium {
 @media (max-width: 480px) {
   .command-palette-overlay {
     padding-top: 0;
-    align-items: flex-end; /* Bottom sheet design */
-    height: 100dvh; /* Use dynamic viewport height to fix iOS 100vh bug */
+    align-items: flex-end;
+    /* Bottom sheet design */
+    height: 100dvh;
+    /* Use dynamic viewport height to fix iOS 100vh bug */
   }
 
   .command-palette {
@@ -1818,17 +1820,28 @@ select.input-premium {
     margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important; /* Bottom sheet rounded top only */
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+    /* Bottom sheet rounded top only */
     max-height: calc(90dvh - 75px - env(safe-area-inset-bottom)) !important;
-    margin-bottom: calc(65px + env(safe-area-inset-bottom)) !important; /* Rest exactly on top of bottom nav */
-    overflow-y: auto; /* Enable scrolling for long forms */
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; /* Smooth slide up */
+    margin-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
+    /* Rest exactly on top of bottom nav */
+    overflow-y: auto;
+    /* Enable scrolling for long forms */
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    /* Smooth slide up */
   }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* -- Fix bottom navigation overlap on mobile screens -- */
