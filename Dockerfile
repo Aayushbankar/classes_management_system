@@ -39,5 +39,8 @@ RUN DATABASE_URL=sqlite:///tmp/dummy.db python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-# Render passes $PORT, default to 8000
-CMD gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2
+# Copy and use startup script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]
