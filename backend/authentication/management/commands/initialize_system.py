@@ -69,8 +69,24 @@ PAYMENT_MODES = ['cash', 'upi', 'cheque', 'cash', 'upi', 'cash']  # weighted tow
 class Command(BaseCommand):
     help = 'Initialize the system with realistic Bhavnagar demo data.'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--reset', action='store_true', help='Wipe ALL existing data before seeding.')
+
     def handle(self, *args, **options):
         self.stdout.write(self.style.MIGRATE_HEADING('--- Eklavya System Initialization ---'))
+
+        if options.get('reset'):
+            self.stdout.write(self.style.WARNING('RESET MODE: Wiping all existing data...'))
+            Notification.objects.all().delete()
+            TestSchedule.objects.all().delete()
+            TimetableSlot.objects.all().delete()
+            FeePayment.objects.all().delete()
+            Student.objects.all().delete()
+            Teacher.objects.all().delete()
+            Branch.objects.all().delete()
+            User.objects.all().delete()
+            self.stdout.write(self.style.SUCCESS('All data wiped. Re-seeding...'))
+
         random.seed(42)  # reproducible
 
         # ── 1. USERS ──
