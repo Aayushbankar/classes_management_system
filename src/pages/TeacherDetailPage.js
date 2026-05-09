@@ -36,80 +36,95 @@ function TeacherDetailPage() {
 
   if (error) {
     return (
-      <div className="page-panel">
-        <div className="dashboard-header">
+      <div className="animate-fade-in">
+        <div className="mb-4">
           <p className="subtitle">Faculty</p>
-          <h2>Teacher Details</h2>
+          <h2 className="fs-1">Teacher Details</h2>
         </div>
-        <div className="error-box">{error}</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/app/teachers')}>Back to faculty</button>
+        <div className="alert alert-danger rounded-3 px-4">{error}</div>
+        <button className="btn btn-premium" onClick={() => navigate('/app/teachers')}>← Back to Faculty</button>
       </div>
     );
   }
 
   if (!teacher) {
     return (
-      <div className="page-panel">
-        <div className="dashboard-header">
+      <div className="animate-fade-in">
+        <div className="mb-4">
           <p className="subtitle">Faculty</p>
-          <h2>Teacher Details</h2>
+          <h2 className="fs-1">Teacher Details</h2>
         </div>
-        <div className="card-grid">
-          <div className="stat-card"><p className="kpi-title">Loading teacher…</p></div>
+        <div className="glass-card text-center py-5">
+          <p className="text-muted m-0">Loading teacher…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="page-panel animate-fade-in">
-      <div className="dashboard-header">
+    <div className="animate-fade-in">
+      <div className="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3">
         <div>
           <p className="subtitle">Faculty</p>
-          <h2>{teacher.name}</h2>
+          <h2 className="fs-1">{teacher.name}</h2>
         </div>
-        <div className="page-header-actions">
-          <Link className="btn btn-secondary" to="/app/teachers">Back</Link>
-          <button className="btn btn-primary" onClick={() => navigate('/app/teachers')}>Faculty list</button>
-        </div>
+        <Link className="btn btn-premium" to="/app/teachers">← Back to Faculty</Link>
       </div>
 
-      <div className="card-grid">
-        <div className="stat-card"><p className="stat-label">Subject</p><h3>{teacher.subject || 'N/A'}</h3></div>
-        <div className="stat-card"><p className="stat-label">Class</p><h3>{teacher.assigned_standard || 'N/A'}</h3></div>
-        <div className="stat-card"><p className="stat-label">Branch</p><h3>{teacher.branch_name || 'N/A'}</h3></div>
-        <div className="stat-card">
-          <p className="stat-label">Status</p>
-          <span className={`badge rounded-pill px-3 ${teacher.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'}`} style={{ width: 'fit-content', marginTop: '0.5rem' }}>
+      <div className="dashboard-grid mb-4">
+        <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper" style={{ background: 'var(--primary-soft)' }}><span>📚</span></div>
+          <p className="text-muted small fw-bold m-0">Subject</p>
+          <span className="stat-value" style={{ fontSize: '1.1rem' }}>{teacher.subject || 'N/A'}</span>
+        </div>
+        <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><span>🎓</span></div>
+          <p className="text-muted small fw-bold m-0">Assigned Class</p>
+          <span className="stat-value" style={{ fontSize: '1.1rem' }}>{teacher.assigned_standard || 'N/A'}</span>
+        </div>
+        <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)' }}><span>🏢</span></div>
+          <p className="text-muted small fw-bold m-0">Branch</p>
+          <span className="stat-value" style={{ fontSize: '1.1rem' }}>{teacher.branch_name || 'N/A'}</span>
+        </div>
+        <div className="glass-card stat-card">
+          <div className="stat-icon-wrapper" style={{ background: teacher.is_active ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100,116,139,0.1)' }}><span>{teacher.is_active ? '✅' : '⏸️'}</span></div>
+          <p className="text-muted small fw-bold m-0">Status</p>
+          <span className={`badge rounded-pill px-3 mt-1 ${teacher.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'}`}>
             {teacher.is_active ? 'Active' : 'Inactive'}
           </span>
         </div>
       </div>
 
-      <div className="panel-section">
-        <div className="panel-heading">
-          <h3>Personal Details</h3>
-          <p className="panel-subtitle">Contact and employment information.</p>
-        </div>
-
-        <div className="info-grid">
-          <div className="info-card">
-            <div className="info-card-header">
-              <h4>Contact Info</h4>
+      {/* Contact Info */}
+      <div className="glass-card mb-4">
+        <h4 className="fs-5 mb-4 fw-bold">Contact Information</h4>
+        <div className="d-flex flex-column gap-3">
+          {[
+            ['✉️', 'Email', teacher.email || '—'],
+            ['📞', 'Phone', teacher.phone || '—'],
+            ['📚', 'Subject', teacher.subject || '—'],
+            ['🎓', 'Primary Class', teacher.assigned_standard || '—'],
+          ].map(([icon, label, value]) => (
+            <div key={label} className="d-flex align-items-center gap-3 p-2 rounded-3" style={{ background: 'var(--surface-muted)' }}>
+              <span style={{ fontSize: '1.1rem' }}>{icon}</span>
+              <div style={{ flex: 1 }}>
+                <p className="m-0" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>{label}</p>
+                <p className="m-0 fw-semibold" style={{ fontSize: '0.9rem' }}>{value}</p>
+              </div>
             </div>
-            <div className="info-stat-grid">
-              <div className="info-stat"><label>Email</label><span>{teacher.email || '-'}</span></div>
-              <div className="info-stat"><label>Phone</label><span>{teacher.phone || '-'}</span></div>
-              <div className="info-stat"><label>Subject</label><span>{teacher.subject || '-'}</span></div>
-              <div className="info-stat"><label>Primary Class</label><span>{teacher.assigned_standard || '-'}</span></div>
-            </div>
-          </div>
+          ))}
         </div>
+      </div>
 
-        <div style={{ marginTop: '2rem' }}>
-          <h3>Weekly Schedule</h3>
-          <div className="excel-table-wrapper">
-            <table className="excel-table">
+      {/* Weekly Schedule */}
+      <div className="glass-card">
+        <h4 className="fs-5 mb-3 fw-bold">Weekly Schedule</h4>
+
+        {/* Desktop: Table */}
+        <div className="d-none d-md-block">
+          <div className="data-grid-container">
+            <table className="data-grid-table">
               <thead>
                 <tr>
                   <th>Day</th>
@@ -121,20 +136,43 @@ function TeacherDetailPage() {
               </thead>
               <tbody>
                 {slots.length === 0 && (
-                  <tr><td colSpan={5} className="empty-state">No schedule slots assigned</td></tr>
+                  <tr><td colSpan={5} className="text-center py-5 text-muted">No schedule slots assigned</td></tr>
                 )}
                 {slots.map(slot => (
                   <tr key={slot.id}>
                     <td className="fw-bold" style={{ textTransform: 'capitalize' }}>{slot.day_of_week}</td>
                     <td>{slot.start_time?.slice(0, 5)} – {slot.end_time?.slice(0, 5)}</td>
-                    <td>{slot.subject}</td>
+                    <td className="fw-semibold">{slot.subject}</td>
                     <td><span className="badge" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>{slot.standard}</span></td>
-                    <td>{slot.location || '-'}</td>
+                    <td>{slot.location || '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile: Cards */}
+        <div className="d-md-none d-flex flex-column gap-2">
+          {slots.length === 0 && (
+            <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}>
+              <p className="fs-3 mb-1">📅</p>
+              <p className="m-0">No schedule slots assigned</p>
+            </div>
+          )}
+          {slots.map(slot => (
+            <div key={slot.id} className="p-3 rounded-3" style={{ background: 'var(--surface-muted)' }}>
+              <div className="d-flex justify-content-between align-items-start mb-2">
+                <span className="fw-bold" style={{ textTransform: 'capitalize', fontSize: '0.95rem' }}>{slot.day_of_week}</span>
+                <span className="badge rounded-pill" style={{ background: 'var(--primary-soft)', color: 'var(--primary)', fontSize: '0.7rem' }}>{slot.standard}</span>
+              </div>
+              <div className="d-flex flex-wrap gap-3" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <span>🕐 {slot.start_time?.slice(0, 5)} – {slot.end_time?.slice(0, 5)}</span>
+                <span>📚 {slot.subject}</span>
+                <span>📍 {slot.location || '—'}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

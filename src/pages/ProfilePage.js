@@ -166,6 +166,61 @@ function ProfilePage() {
         </div>
       )}
 
+      {/* Access Level Card */}
+      {profile && (
+        <div className="glass-card mb-4">
+          <h4 className="fs-5 mb-3 fw-bold">🔑 Access Level</h4>
+          <div className="d-flex align-items-center gap-3 p-3 rounded-3" style={{
+            background: roleBadge.bg,
+            border: `1px solid ${roleBadge.color}20`,
+          }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: '12px', flexShrink: 0,
+              background: roleBadge.color,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.3rem', color: 'white',
+            }}>
+              {profile.role === 'owner' ? '👑' : profile.role === 'admin' ? '🛡️' : '👤'}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p className="m-0 fw-bold" style={{ fontSize: '1rem', color: roleBadge.color }}>
+                {roleBadge.label} Privileges
+              </p>
+              <p className="m-0 mt-1" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                {profile.role === 'owner'
+                  ? 'Full access — manage all branches, users, students, teachers, finances, and system settings.'
+                  : profile.role === 'admin'
+                    ? 'Branch-level access — manage students, teachers, and finances for your assigned branch. Can create assistant users.'
+                    : 'View-only access — read-only permissions for your assigned branch data.'}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 d-flex flex-wrap gap-2">
+            {[
+              { label: 'View Data', allowed: true },
+              { label: 'Edit Records', allowed: profile.role === 'owner' || profile.role === 'admin' },
+              { label: 'Manage Users', allowed: profile.role === 'owner' || profile.role === 'admin' },
+              { label: 'Delete Records', allowed: profile.role === 'owner' || profile.role === 'admin' },
+              { label: 'All Branches', allowed: profile.role === 'owner' },
+              { label: 'System Settings', allowed: profile.role === 'owner' },
+            ].map(perm => (
+              <span
+                key={perm.label}
+                className="px-3 py-1 rounded-pill fw-semibold"
+                style={{
+                  fontSize: '0.72rem',
+                  background: perm.allowed ? 'rgba(16,185,129,0.1)' : 'rgba(100,116,139,0.08)',
+                  color: perm.allowed ? '#10b981' : 'var(--text-muted)',
+                  border: `1px solid ${perm.allowed ? 'rgba(16,185,129,0.2)' : 'var(--border)'}`,
+                }}
+              >
+                {perm.allowed ? '✓' : '✕'} {perm.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="row g-4">
         {/* Profile Info Card */}
         <div className="col-12 col-lg-6">

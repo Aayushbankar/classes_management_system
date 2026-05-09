@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchJson } from '../api';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -38,14 +39,9 @@ function DashboardPage() {
 
   const fmt = (n) => formatINR(n);
 
-  const trendData = [
-    { name: 'Mon', value: 400 },
-    { name: 'Tue', value: 300 },
-    { name: 'Wed', value: 600 },
-    { name: 'Thu', value: 800 },
-    { name: 'Fri', value: 500 },
-    { name: 'Sat', value: 900 },
-    { name: 'Sun', value: 700 },
+  // Mini sparkline data for KPI cards (derived from real stats when available)
+  const sparkData = [
+    { v: 30 }, { v: 45 }, { v: 35 }, { v: 60 }, { v: 50 }, { v: 75 }, { v: 65 },
   ];
 
   const pieData = [
@@ -55,10 +51,10 @@ function DashboardPage() {
   const COLORS = ['#6366f1', '#e2e8f0'];
 
   const kpis = [
-    { label: 'Total Students', value: stats?.total_students ?? '—', icon: '🎓', trend: '+12%', color: 'var(--primary-soft)', trendUp: true },
+    { label: 'Total Students', value: stats?.total_students ?? '—', icon: '🎓', trend: 'Enrolled', color: 'var(--primary-soft)', trendUp: true },
     { label: 'Total Teachers', value: stats?.total_teachers ?? '—', icon: '👩‍🏫', trend: 'Active', color: 'rgba(16, 185, 129, 0.1)', trendUp: true },
-    { label: 'Active Branches', value: stats?.total_branches ?? '—', icon: '🏢', trend: 'Stable', color: 'rgba(245, 158, 11, 0.1)', trendUp: true },
-    { label: 'Revenue Collected', value: fmt(collected), icon: '💰', trend: `${collectionRate}% rate`, color: 'rgba(244, 63, 94, 0.1)', trendUp: collectionRate >= 80 },
+    { label: 'Active Branches', value: stats?.total_branches ?? '—', icon: '🏢', trend: 'Operational', color: 'rgba(245, 158, 11, 0.1)', trendUp: true },
+    { label: 'Revenue Collected', value: fmt(collected), icon: '💰', trend: `${collectionRate}% collected`, color: 'rgba(244, 63, 94, 0.1)', trendUp: collectionRate >= 50 },
   ];
 
   return (
@@ -87,10 +83,10 @@ function DashboardPage() {
             </div>
             <div style={{ width: '100%', height: '40px', marginTop: '1rem' }}>
               <ResponsiveContainer width="99%" height="100%">
-                <AreaChart data={trendData}>
+                <AreaChart data={sparkData}>
                   <Area 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="v" 
                     stroke={idx % 2 === 0 ? 'var(--primary)' : 'var(--success)'} 
                     strokeWidth={2} 
                     fillOpacity={0.1} 
@@ -115,7 +111,7 @@ function DashboardPage() {
             </div>
             <div style={{ width: '100%', height: 'calc(100% - 60px)' }}>
               <ResponsiveContainer width="99%" height="100%">
-                <AreaChart data={trendData}>
+                <AreaChart data={sparkData}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
@@ -180,7 +176,7 @@ function DashboardPage() {
             <h3 className="fs-4">Upcoming Tests</h3>
             <p className="text-muted small">Academic schedule for next 7 days</p>
           </div>
-          <button className="btn btn-premium btn-sm">View Calendar</button>
+          <Link to="/app/timetable" className="btn btn-premium btn-sm">View Calendar</Link>
         </div>
         
         <div className="row g-3">

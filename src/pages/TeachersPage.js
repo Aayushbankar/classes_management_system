@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchList, postJson, putJson, deleteJson, isAdmin } from '../api';
 import { exportToExcel, TEACHER_COLS } from '../utils/export';
-import { formatCurrency } from '../utils/format';
 
 const emptyTeacher = { name: '', email: '', phone: '', subject: '', assigned_standard: '', branch: '' };
 
@@ -153,12 +152,12 @@ function TeachersPage() {
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper" style={{ background: 'var(--primary-soft)' }}><span>👩‍🏫</span></div>
           <p className="text-muted small fw-bold m-0">Total Faculty</p>
-          <span className="stat-value">{formatCurrency(teachers.length)}</span>
+          <span className="stat-value">{teachers.length}</span>
         </div>
         <div className="glass-card stat-card">
           <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><span>📅</span></div>
           <p className="text-muted small fw-bold m-0">Active Teachers</p>
-          <span className="stat-value">{formatCurrency(teachers.filter(t => t.is_active !== false).length)}</span>
+          <span className="stat-value">{teachers.filter(t => t.is_active !== false).length}</span>
         </div>
       </div>
 

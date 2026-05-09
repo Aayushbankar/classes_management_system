@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchList, postJson, putJson, deleteJson, getCurrentUser, canManageUsers } from '../api';
+import './UsersPage.css';
 
 const emptyForm = {
   username: '',
@@ -25,7 +26,7 @@ function UsersPage() {
 
   const user = getCurrentUser();
   const allowed = canManageUsers();
-  const isOwner = user && user.role === 'owner';
+  const isOwner = user && (user.role === 'owner' || user.is_superuser);
   const isAdminUser = user && user.role === 'admin';
 
   const load = async () => {
@@ -56,7 +57,7 @@ function UsersPage() {
     setEditId(null);
     setForm({
       ...emptyForm,
-      role: isOwner ? 'assistant' : 'assistant',
+      role: 'assistant',
       branch: isAdminUser ? user.branch : '',
     });
     setModal('add');
@@ -183,72 +184,107 @@ function UsersPage() {
               className="input-premium py-2"
               style={{ maxWidth: '240px', flex: '1 1 160px' }}
             />
-            <button className="btn btn-primary" onClick={openAdd}>+ Add User</button>
+            <button className="btn btn-primary d-none d-md-block" onClick={openAdd}>+ Add User</button>
           </div>
         </div>
 
         {loading ? (
           <p>Loading users...</p>
         ) : (
-          <table className="data-table" style={{ width: '100%', marginTop: 12 }}>
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Branch</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(() => {
-                const q = searchQuery.toLowerCase();
-                const filtered = users.filter(u => !q || (u.username && u.username.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q)) || (`${u.first_name || ''} ${u.last_name || ''}`.toLowerCase().includes(q)) || (u.role && u.role.toLowerCase().includes(q)) || (u.branch_name && u.branch_name.toLowerCase().includes(q)));
-                if (filtered.length === 0) return <tr><td colSpan={6} className="empty-state">No users match your search.</td></tr>;
-                return filtered.map(u => (
-                <tr key={u.id}>
-                  <td>{u.username}</td>
-                  <td>{u.email}</td>
-                  <td>{`${u.first_name || ''} ${u.last_name || ''}`.trim()}</td>
-                  <td>{u.role}</td>
-                  <td>{u.branch_name || '-'}</td>
-                  <td>
-                    <button className="btn btn-ghost btn-sm" onClick={() => openEdit(u)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)} style={{ marginLeft: 8 }}>Delete</button>
-                  </td>
-                </tr>
-                ));
-              })()}
-            </tbody>
-          </table>
+          <div className="user-cards-grid">
+            {(() => {
+              const q = searchQuery.toLowerCase();
+              const filtered = users.filter(u => !q || (u.username && u.username.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q)) || (`${u.first_name || ''} ${u.last_name || ''}`.toLowerCase().includes(q)) || (u.role && u.role.toLowerCase().includes(q)) || (u.branch_name && u.branch_name.toLowerCase().includes(q)));
+              if (filtered.length === 0) return <div className="glass-card text-center py-5 w-100"><p className="text-muted m-0">No users match your search.</p></div>;
+              
+              return filtered.map(u => (
+                <div key={u.id} className="user-card">
+                  <div className="user-card-header">
+                    <div className="user-avatar">
+                      {(u.first_name?.[0] || u.username?.[0] || '?').toUpperCase()}
+                    </div>
+                    <div className="user-info">
+                      <p className="user-name">{`${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username}</p>
+                      <span className={`user-role-badge role-${u.role || 'assistant'}`}>
+                        {u.role}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="user-details">
+                    <div className="detail-item">
+                      <span>📧</span>
+                      <span>{u.email || 'No email'}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span>🏢</span>
+                      <span>{u.branch_name || 'All Branches'}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span>👤</span>
+                      <span>@{u.username}</span>
+                    </div>
+                  </div>
+
+                  <div className="user-actions">
+                    <button className="btn btn-premium btn-sm flex-grow-1" style={{ background: 'var(--surface-muted)', color: 'var(--text)', boxShadow: 'none' }} onClick={() => openEdit(u)}>
+                      Edit Profile
+                    </button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ));
+            })()}
+          </div>
         )}
       </div>
 
+      {/* Floating Action Button for Mobile */}
+      <button className="add-user-fab d-md-none" onClick={openAdd} aria-label="Add User">
+        +
+      </button>
+
       {modal && (
-        <div className="modal-backdrop" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 580 }}>
-            <div className="modal-header">
-              <h3>{modal === 'add' ? 'Add User' : 'Edit User'}</h3>
-              <button className="modal-close" onClick={closeModal}>&times;</button>
+        <div className="user-modal-overlay" onClick={closeModal}>
+          <div className="user-modal-container" onClick={e => e.stopPropagation()}>
+            <div className="user-modal-header">
+              <h3 className="m-0 fs-4">{modal === 'add' ? '✨ Add New User' : '📝 Edit User Profile'}</h3>
+              <button className="btn btn-link text-dark text-decoration-none fs-3 p-0" onClick={closeModal}>&times;</button>
             </div>
-            <div>
-              <div className="form-row">
-                <div className="form-group"><label>Username</label><input value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))} /></div>
-                <div className="form-group"><label>Email</label><input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>First Name</label><input value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} /></div>
-                <div className="form-group"><label>Last Name</label><input value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Role</label>
-                  <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
+            <div className="user-modal-body">
+              {error && <div className="alert alert-danger py-2 small mb-3">{error}</div>}
+              
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="filter-label">Username</label>
+                  <input className="input-premium" value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))} placeholder="e.g. jdoe" />
+                </div>
+                <div className="form-group">
+                  <label className="filter-label">Email Address</label>
+                  <input type="email" className="input-premium" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="jdoe@example.com" />
+                </div>
+                
+                <div className="form-group">
+                  <label className="filter-label">First Name</label>
+                  <input className="input-premium" value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} placeholder="John" />
+                </div>
+                <div className="form-group">
+                  <label className="filter-label">Last Name</label>
+                  <input className="input-premium" value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} placeholder="Doe" />
+                </div>
+                
+                <div className="form-group">
+                  <label className="filter-label">Access Level</label>
+                  <select className="input-premium" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
                     {roleOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                   </select>
                 </div>
-                <div className="form-group"><label>Branch</label>
+                <div className="form-group">
+                  <label className="filter-label">Assigned Branch</label>
                   <select
+                    className="input-premium"
                     value={form.branch}
                     onChange={e => setForm(f => ({ ...f, branch: e.target.value }))}
                     disabled={isAdminUser}
@@ -257,15 +293,22 @@ function UsersPage() {
                     {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
                 </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Password</label><input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} /></div>
-                <div className="form-group"><label>Confirm Password</label><input type="password" value={form.password_confirm} onChange={e => setForm(f => ({ ...f, password_confirm: e.target.value }))} /></div>
+                
+                <div className="form-group">
+                  <label className="filter-label">{modal === 'edit' ? 'New Password (Optional)' : 'Password'}</label>
+                  <input type="password" className="input-premium" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="filter-label">Confirm Password</label>
+                  <input type="password" className="input-premium" value={form.password_confirm} onChange={e => setForm(f => ({ ...f, password_confirm: e.target.value }))} />
+                </div>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={closeModal}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSave}>{modal === 'add' ? 'Create User' : 'Save Changes'}</button>
+            <div className="user-modal-footer">
+              <button className="btn btn-premium btn-sm" style={{ background: 'var(--surface-muted)', color: 'var(--text)', boxShadow: 'none' }} onClick={closeModal}>Cancel</button>
+              <button className="btn btn-premium btn-sm px-4" onClick={handleSave}>
+                {modal === 'add' ? 'Create Account' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>

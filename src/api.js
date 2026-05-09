@@ -19,7 +19,7 @@ async function handle401(response) {
     if (refreshToken && !isRefreshing) {
       isRefreshing = true;
       try {
-        const refreshResponse = await fetch(`${API_URL}/api/token/refresh/`, {
+        const refreshResponse = await fetch(`${API_URL}/token/refresh/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh: refreshToken }),

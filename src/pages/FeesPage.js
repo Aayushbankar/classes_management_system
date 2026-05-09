@@ -146,12 +146,59 @@ function FeesPage() {
 
   return (
     <div className="animate-fade-in dashboard-shell">
+      {showFilters && <div className="drawer-backdrop d-lg-none" onClick={() => setShowFilters(false)} style={{ zIndex: 9000 }} />}
+      <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
+        <div className="d-flex justify-content-between align-items-center mb-4 d-lg-none">
+          <h4 className="m-0 fw-bold fs-4">Filters</h4>
+          <button className="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" 
+                  style={{ width: '40px', height: '40px', fontSize: '1.25rem' }} 
+                  onClick={() => setShowFilters(false)}>
+            &times;
+          </button>
+        </div>
+        <h4 className="fs-6 m-0 d-none d-lg-block">Slicers & Filters</h4>
+
+        <div className="filter-group">
+          <label className="filter-label">Branch</label>
+          <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
+            <option value="">All Branches</option>
+            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label className="filter-label">Class / Standard</label>
+          <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
+            {standards.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+
+        {batchOptions.length > 0 && (
+          <div className="filter-group">
+            <label className="filter-label">Batch Time</label>
+            <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
+              <option value="">All Batches</option>
+              {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div className="mt-2">
+          <input
+            type="text"
+            className="input-premium py-2"
+            placeholder="🔍 Search Student..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
       <div className="analysis-header">
         <div>
           <p className="subtitle">Finance Analysis</p>
           <h2 className="fs-1">Revenue Dashboard</h2>
         </div>
-        <div className="d-flex gap-2 flex-wrap">
+        <div className="mobile-action-bar">
           <button className="btn btn-outline-primary d-lg-none rounded-pill px-4" onClick={() => setShowFilters(!showFilters)}>
             {showFilters ? '✕ Close Filters' : '🔍 Filter Data'}
           </button>
@@ -171,46 +218,8 @@ function FeesPage() {
       </div>
 
       <div className="row g-4">
-        {/* Left Sidebar Filters - Power BI Style */}
-        <div className="col-12 col-lg-3">
-          <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
-            <h4 className="fs-6 m-0">Slicers & Filters</h4>
-
-            <div className="filter-group">
-              <label className="filter-label">Branch</label>
-              <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
-                <option value="">All Branches</option>
-                {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Class / Standard</label>
-              <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
-                {standards.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-
-            {batchOptions.length > 0 && (
-              <div className="filter-group">
-                <label className="filter-label">Batch Time</label>
-                <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
-                  <option value="">All Batches</option>
-                  {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-            )}
-
-            <div className="mt-2">
-              <input
-                type="text"
-                className="input-premium py-2"
-                placeholder="🔍 Search Student..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+        {/* Left Sidebar Filters - Power BI Style Placeholder */}
+        <div className="col-lg-3 d-none d-lg-block">
         </div>
 
         {/* Main Content Area */}
@@ -219,7 +228,7 @@ function FeesPage() {
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Total Collected</p>
               <h3 className="stat-value text-success">{formatINR(collected)}</h3>
-              <div className="small text-muted mt-2">↑ 12% vs last month</div>
+              <div className="small text-muted mt-2">Total received</div>
             </div>
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Expected</p>
@@ -236,7 +245,7 @@ function FeesPage() {
             <div className="glass-card stat-card hover-lift">
               <p className="filter-label m-0">Pending</p>
               <h3 className="stat-value text-danger">{formatINR(pending)}</h3>
-              <div className="small text-muted mt-2">{filteredPayments.length} pending items</div>
+              <div className="small text-muted mt-2">{payments.length} transactions</div>
             </div>
           </div>
 
@@ -344,6 +353,8 @@ function FeesPage() {
         </div>
       </div>
 
+
+
       {modal && (
         <div className="command-palette-overlay" onClick={closeModal}>
           <div className="glass-card animate-fade-in m-3" style={{ maxWidth: '500px', width: '100%' }} onClick={e => e.stopPropagation()}>
@@ -429,7 +440,7 @@ function FeesPage() {
         </div>
       )}
 
-      {/* Fee Receipt — hidden in UI, visible during print */}
+      {/* Fee Receipt */}
       <FeeReceipt payment={printPayment} student={students.find(s => s.id === printPayment?.student)} />
     </div>
   );

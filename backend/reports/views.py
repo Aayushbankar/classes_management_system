@@ -175,7 +175,7 @@ class GlobalSearchView(APIView):
                 'type': 'student',
                 'title': student.name,
                 'subtitle': f"Std: {student.standard} | Roll: {student.roll_number}",
-                'path': '/students',
+                'path': f'/app/students/{student.id}',
                 'icon': '🎓'
             })
 
@@ -193,7 +193,7 @@ class GlobalSearchView(APIView):
                 'type': 'teacher',
                 'title': teacher.name,
                 'subtitle': f"Subject: {teacher.subject}",
-                'path': '/teachers',
+                'path': f'/app/teachers/{teacher.id}',
                 'icon': '👩‍🏫'
             })
 
@@ -211,7 +211,7 @@ class GlobalSearchView(APIView):
                 'type': 'fee',
                 'title': f"₹{payment.amount} - {payment.student.name}",
                 'subtitle': f"Mode: {payment.payment_mode} | Ref: {payment.reference or 'N/A'}",
-                'path': '/fees',
+                'path': '/app/fees',
                 'icon': '💰'
             })
 

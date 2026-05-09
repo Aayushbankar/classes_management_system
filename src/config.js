@@ -1,8 +1,9 @@
 /**
  * API Configuration
- * Change the API_URL here to switch between development and production servers
+ * In production, set REACT_APP_API_URL environment variable.
+ * In development, defaults to local Django server.
  */
 
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
 
 export default API_URL;

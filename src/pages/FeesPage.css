@@ -315,3 +315,114 @@
   font-weight: 600;
   font-size: 1rem;
 }
+
+/* Filter Pane / Sidebar */
+.filter-pane {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 18px 30px rgba(16, 42, 67, 0.06);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-group {
+  margin-bottom: 0; /* Handled by gap */
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile Filter Pane styles - Premium Top Drawer */
+@media (max-width: 991px) {
+  .filter-pane {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: 85vh !important;
+    z-index: 5000 !important;
+    background: var(--surface) !important;
+    border-radius: 0 0 24px 24px !important;
+    padding: 24px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    overflow-y: auto !important;
+    transform: translateY(-100%) !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    opacity: 1 !important;
+    pointer-events: none;
+    border: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    margin: 0 !important;
+  }
+  
+  .filter-pane.open {
+    transform: translateY(0) !important;
+    pointer-events: auto;
+  }
+
+  .filter-group {
+    margin-bottom: 1.25rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+  }
+
+  .filter-group:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .filter-pane h4 {
+    color: var(--text) !important;
+    font-weight: 800 !important;
+    font-size: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Prevent analysis header buttons from stretching on mobile */
+  .mobile-action-bar {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding: 8px 2px 16px !important;
+    -webkit-overflow-scrolling: touch !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    margin-top: 1rem !important;
+  }
+
+  .mobile-action-bar .btn {
+    flex-shrink: 0 !important;
+    width: auto !important;
+    white-space: nowrap !important;
+    padding: 10px 24px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 22px !important;
+  }
+}
+
+
+

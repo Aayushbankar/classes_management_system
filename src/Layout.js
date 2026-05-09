@@ -56,6 +56,7 @@ function Layout() {
     { name: "Fees", path: "fees", icon: "💰" },
     { name: "Reports", path: "reports", icon: "📈" },
     { name: "Branches", path: "branches", icon: "🏢" },
+    { name: "Users", path: "users", icon: "👥" },
     { name: "Notifications", path: "notifications", icon: "🔔" },
     { name: "Profile", path: "profile", icon: "👤" },
   ];
@@ -93,7 +94,7 @@ function Layout() {
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const data = await fetchJson(`/api/search/?q=${encodeURIComponent(searchQuery)}`);
+        const data = await fetchJson(`/search/?q=${encodeURIComponent(searchQuery)}`);
         setGlobalResults(data.results || []);
       } catch (e) { console.error("Search failed", e); }
       finally { setIsSearching(false); }
