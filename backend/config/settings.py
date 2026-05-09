@@ -67,11 +67,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+_db_url = os.environ.get('DATABASE_URL')
+if not _db_url:
+    # Local dev: read from .env via python-decouple
+    _db_url = config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
-        conn_max_age=600,
-    )
+    'default': dj_database_url.parse(_db_url, conn_max_age=600)
 }
 
 AUTH_PASSWORD_VALIDATORS = [

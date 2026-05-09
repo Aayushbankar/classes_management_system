@@ -3,6 +3,9 @@
 
 set -o errexit
 
+# Debug: show DATABASE_URL scheme (safe - no credentials)
+echo "DATABASE_URL starts with: $(echo $DATABASE_URL | cut -c1-15)..."
+
 echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
