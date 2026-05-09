@@ -74,7 +74,7 @@ function Login() {
         {/* Logo Top */}
         <img src={logo} alt="logo" className="top-logo" />
 
-        <h2>Eklavya App</h2>
+        <h2>Eklavya Classes</h2>
 
         {error && <div className="error-box">{error}</div>}
 
