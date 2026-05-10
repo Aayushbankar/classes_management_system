@@ -284,7 +284,7 @@ function Layout() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
-              <Badge bg="light" text="dark" className="border">ESC</Badge>
+              <Badge bg="none" className="border text-muted" style={{ fontSize: '0.6rem' }}>ESC</Badge>
             </div>
 
             <div className="command-results">

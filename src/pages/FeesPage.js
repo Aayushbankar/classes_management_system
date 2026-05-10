@@ -107,7 +107,7 @@ function FeesPage() {
     }));
   }, [payments]);
 
-  const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+  const COLORS = ['var(--primary)', 'var(--success)', 'var(--warning)', 'var(--accent)', 'var(--danger)'];
 
   const filteredPayments = useMemo(() => {
     const q = searchQuery.toLowerCase();
@@ -201,7 +201,7 @@ function FeesPage() {
           <p className="subtitle">Finance Analysis</p>
           <h2 className="fs-1">Revenue Dashboard</h2>
         </div>
-        <div className="mobile-action-bar">
+        <div className="mobile-action-bar d-flex flex-wrap gap-2">
           <button className="btn btn-outline-primary d-lg-none rounded-pill px-4" onClick={() => setShowFilters(!showFilters)}>
             {showFilters ? '✕ Close Filters' : '🔍 Filter Data'}
           </button>
@@ -277,9 +277,9 @@ function FeesPage() {
                           <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={v => `₹${v / 1000}K`} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} tickFormatter={v => `₹${v / 1000}K`} />
                       <RechartsTooltip content={<CustomTooltip />} />
                       <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
                     </AreaChart>

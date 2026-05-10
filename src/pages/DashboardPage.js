@@ -54,7 +54,7 @@ function DashboardPage() {
     { name: 'Collected', value: collected },
     { name: 'Pending', value: pending },
   ];
-  const COLORS = ['#6366f1', '#e2e8f0'];
+  const COLORS = ['var(--primary)', 'var(--border)'];
 
   const kpis = [
     { label: 'Total Students', value: stats?.total_students ?? '—', icon: '🎓', trend: 'Enrolled', color: 'var(--primary-soft)', trendUp: true },
@@ -110,7 +110,7 @@ function DashboardPage() {
           <div className="glass-card" style={{ height: 'clamp(280px, 40vw, 400px)' }}>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="fs-5">Weekly Revenue Trend</h3>
-              <select className="form-select form-select-sm w-auto border-0 bg-light rounded-pill">
+              <select className="form-select form-select-sm w-auto border-0 rounded-pill px-3" style={{ background: 'var(--surface-muted)', color: 'var(--text)' }}>
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
               </select>
@@ -120,17 +120,24 @@ function DashboardPage() {
                 <AreaChart data={sparkData}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
                   <YAxis hide />
                   <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    contentStyle={{ 
+                      borderRadius: '12px', 
+                      border: '1px solid var(--border)', 
+                      background: 'var(--surface)',
+                      boxShadow: 'var(--shadow-md)',
+                      color: 'var(--text)'
+                    }}
+                    itemStyle={{ color: 'var(--text)' }}
                   />
-                  <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                  <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

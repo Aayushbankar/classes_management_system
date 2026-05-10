@@ -156,6 +156,54 @@
 }
 
 /* ═══════════════════════════════════════
+   GLOBAL THEME ADAPTATION
+   ═══════════════════════════════════════ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Override Bootstrap Defaults to follow themes */
+.text-muted { color: var(--text-muted) !important; }
+.bg-light { background-color: var(--surface-muted) !important; }
+.bg-white { background-color: var(--surface) !important; }
+.border { border-color: var(--border) !important; }
+.text-dark { color: var(--text) !important; }
+
+/* Global Form Control Adaptation */
+input, select, textarea {
+  background-color: var(--surface-muted);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+input:focus, select:focus, textarea:focus {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* Scrollbar Theme Adaptation */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════
    CUSTOM PREMIUM SCROLLBAR (Virtual Scrollbar)
    ═══════════════════════════════════════ */
 :root {
