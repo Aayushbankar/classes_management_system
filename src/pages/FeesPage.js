@@ -144,55 +144,58 @@ function FeesPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [printPayment, setPrintPayment] = useState(null);
 
+  const renderFilters = () => (
+    <div className="filter-pane-inner">
+      <div className="d-flex justify-content-between align-items-center mb-4 d-lg-none">
+        <h4 className="m-0 fw-bold fs-4">Filters</h4>
+        <button className="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" 
+                style={{ width: '40px', height: '40px', fontSize: '1.25rem' }} 
+                onClick={() => setShowFilters(false)}>
+          &times;
+        </button>
+      </div>
+      <h4 className="fs-6 m-0 d-none d-lg-block mb-3">Slicers & Filters</h4>
+
+      <div className="filter-group mb-3">
+        <label className="filter-label">Branch</label>
+        <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
+          <option value="">All Branches</option>
+          {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+        </select>
+      </div>
+
+      <div className="filter-group mb-3">
+        <label className="filter-label">Class / Standard</label>
+        <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
+          {standards.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+
+      {batchOptions.length > 0 && (
+        <div className="filter-group mb-3">
+          <label className="filter-label">Batch Time</label>
+          <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
+            <option value="">All Batches</option>
+            {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
+          </select>
+        </div>
+      )}
+
+      <div className="mt-3">
+        <label className="filter-label">Search</label>
+        <input
+          type="text"
+          className="input-premium py-2"
+          placeholder="🔍 Student name..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="animate-fade-in dashboard-shell">
-      {showFilters && <div className="drawer-backdrop d-lg-none" onClick={() => setShowFilters(false)} style={{ zIndex: 9000 }} />}
-      <div className={`filter-pane ${showFilters ? 'open' : ''}`}>
-        <div className="d-flex justify-content-between align-items-center mb-4 d-lg-none">
-          <h4 className="m-0 fw-bold fs-4">Filters</h4>
-          <button className="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" 
-                  style={{ width: '40px', height: '40px', fontSize: '1.25rem' }} 
-                  onClick={() => setShowFilters(false)}>
-            &times;
-          </button>
-        </div>
-        <h4 className="fs-6 m-0 d-none d-lg-block">Slicers & Filters</h4>
-
-        <div className="filter-group">
-          <label className="filter-label">Branch</label>
-          <select className="input-premium py-2" value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setFilterBatch(''); }}>
-            <option value="">All Branches</option>
-            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label className="filter-label">Class / Standard</label>
-          <select className="input-premium py-2" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
-            {standards.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        {batchOptions.length > 0 && (
-          <div className="filter-group">
-            <label className="filter-label">Batch Time</label>
-            <select className="input-premium py-2" value={filterBatch} onChange={e => setFilterBatch(e.target.value)}>
-              <option value="">All Batches</option>
-              {batchOptions.map(b => <option key={b} value={b}>{b}</option>)}
-            </select>
-          </div>
-        )}
-
-        <div className="mt-2">
-          <input
-            type="text"
-            className="input-premium py-2"
-            placeholder="🔍 Search Student..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
       <div className="analysis-header">
         <div>
           <p className="subtitle">Finance Analysis</p>
@@ -217,9 +220,21 @@ function FeesPage() {
         </div>
       </div>
 
+      {/* Mobile Collapsible Filters */}
+      {showFilters && (
+        <div className="col-12 d-lg-none animate-fade-in mb-3">
+          <div className="glass-card">
+            {renderFilters()}
+          </div>
+        </div>
+      )}
+
       <div className="row g-4">
-        {/* Left Sidebar Filters - Power BI Style Placeholder */}
+        {/* Left Sidebar Filters */}
         <div className="col-lg-3 d-none d-lg-block">
+          <div className="filter-pane sticky-top" style={{ top: '1rem' }}>
+            {renderFilters()}
+          </div>
         </div>
 
         {/* Main Content Area */}

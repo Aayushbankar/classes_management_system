@@ -138,7 +138,7 @@ h2 {
 }
 
 /* Button */
-button {
+.login-card button {
   width: 100%;
   padding: 12px;
   margin-top: 15px;
@@ -209,7 +209,7 @@ button:hover {
     font-size: 16px; /* prevents iOS zoom on focus */
   }
 
-  button {
+  .login-card button {
     padding: 14px;
     font-size: 1rem;
     min-height: 48px;

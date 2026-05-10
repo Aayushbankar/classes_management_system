@@ -50,3 +50,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
         notification.is_read = True
         notification.save()
         return Response({'status': 'marked as read'}, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['post'], url_path='mark-all-read')
+    def mark_all_read(self, request):
+        queryset = self.get_queryset().filter(is_read=False)
+        queryset.update(is_read=True)
+        return Response({'status': 'all marked as read'}, status=status.HTTP_200_OK)
