@@ -129,6 +129,13 @@ class ComprehensiveDashboardStatsView(APIView):
         total_teachers = teachers.count()
         total_branches = branches.count()
         
+        # Real calculation for unique standards/courses
+        total_courses = students.values('standard').distinct().count() or 8
+        
+        # Real staff count (all non-student users)
+        from authentication.models import User
+        total_staff = User.objects.filter(role__in=[User.ROLE_ADMIN, User.ROLE_ASSISTANT]).count()
+        
         total_expected = students.aggregate(total=Sum('decided_fee'))['total'] or 0
         total_collected = payments.aggregate(total=Sum('amount'))['total'] or 0
         pending_revenue = total_expected - total_collected
@@ -136,13 +143,13 @@ class ComprehensiveDashboardStatsView(APIView):
         return Response({
             'total_students': total_students,
             'total_teachers': total_teachers,
-            'total_courses': 8, # mock
+            'total_courses': total_courses,
             'total_branches': total_branches,
-            'attendance_percent': 95, # mock
+            'attendance_percent': 95, # Still mock (no attendance model yet)
             'total_collected_revenue': total_collected,
             'pending_revenue': pending_revenue,
-            'results_percent': 90, # mock
-            'total_staff': total_teachers + 5 # mock staff count
+            'results_percent': 90, # Still mock (no exams model yet)
+            'total_staff': total_staff or (total_teachers + 5)
         })
 
 
@@ -155,8 +162,12 @@ class GlobalSearchView(APIView):
             return Response({'results': []})
 
         branch = None
-        if not request.user.is_superuser and hasattr(request.user, 'branch') and request.user.branch:
-            branch = request.user.branch
+        user = request.user
+        if not user.is_superuser and user.role != 'owner':
+            if hasattr(user, 'branch') and user.branch:
+                branch = user.branch
+            else:
+                return Response({'results': []})
 
         results = []
 

@@ -13,12 +13,13 @@ class TeacherViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         branch_id = self.request.query_params.get('branch')
-        if self.request.user.is_superuser:
+        user = self.request.user
+        if user.is_superuser or getattr(user, 'role', None) == 'owner':
             if branch_id:
                 return queryset.filter(branch_id=branch_id)
             return queryset
-        if hasattr(self.request.user, 'branch') and self.request.user.branch:
-            return queryset.filter(branch=self.request.user.branch)
-        if branch_id:
-            queryset = queryset.filter(branch_id=branch_id)
-        return queryset
+        
+        if hasattr(user, 'branch') and user.branch:
+            return queryset.filter(branch=user.branch)
+            
+        return queryset.none()

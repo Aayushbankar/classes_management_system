@@ -32,3 +32,21 @@ class StudentSerializer(serializers.ModelSerializer):
                 notes="Initial payment during registration"
             )
         return student
+
+    def update(self, instance, validated_data):
+        payment_mode = validated_data.pop('payment_mode', 'cash')
+        new_paid_fee = validated_data.get('paid_fee')
+        
+        # If paid_fee is being updated directly, we should create a payment for the difference
+        if new_paid_fee is not None and new_paid_fee != instance.paid_fee:
+            diff = new_paid_fee - instance.paid_fee
+            if diff != 0:
+                FeePayment.objects.create(
+                    student=instance,
+                    amount=diff,
+                    payment_date=timezone.now().date(),
+                    payment_mode=payment_mode,
+                    notes=f"Adjustment payment (Updated from student profile: {instance.paid_fee} -> {new_paid_fee})"
+                )
+        
+        return super().update(instance, validated_data)

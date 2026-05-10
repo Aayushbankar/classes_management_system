@@ -29,14 +29,15 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
         batch_time = self.request.query_params.get('batch')
         student_id = self.request.query_params.get('student')
 
-        if self.request.user.is_superuser:
+        user = self.request.user
+        if user.is_superuser or getattr(user, 'role', None) == 'owner':
             if branch_id:
                 queryset = queryset.filter(student__branch_id=branch_id)
         else:
-            if hasattr(self.request.user, 'branch') and self.request.user.branch:
-                queryset = queryset.filter(student__branch=self.request.user.branch)
-            elif branch_id:
-                queryset = queryset.filter(student__branch_id=branch_id)
+            if hasattr(user, 'branch') and user.branch:
+                queryset = queryset.filter(student__branch=user.branch)
+            else:
+                return queryset.none()
 
         std = self.request.query_params.get('standard')
         if std:

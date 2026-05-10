@@ -26,14 +26,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         standard = self.request.query_params.get('standard')
         name = self.request.query_params.get('name')
 
-        if self.request.user.is_superuser:
+        user = self.request.user
+        if user.is_superuser or getattr(user, 'role', None) == 'owner':
             if branch_id:
                 queryset = queryset.filter(branch_id=branch_id)
         else:
-            if hasattr(self.request.user, 'branch') and self.request.user.branch:
-                queryset = queryset.filter(branch=self.request.user.branch)
-            elif branch_id:
-                queryset = queryset.filter(branch_id=branch_id)
+            if hasattr(user, 'branch') and user.branch:
+                queryset = queryset.filter(branch=user.branch)
+            else:
+                return queryset.none()
 
         if standard:
             queryset = queryset.filter(standard__icontains=standard)
@@ -76,6 +77,14 @@ class StudentViewSet(viewsets.ModelViewSet):
         for row_index, row in enumerate(reader, start=1):
             try:
                 branch_id = row.get('branch') or request.data.get('branch')
+                
+                # Security: Validate branch permission
+                if not request.user.is_superuser and getattr(request.user, 'role', None) != 'owner':
+                    if str(branch_id) != str(request.user.branch_id):
+                        skipped += 1
+                        errors.append({'row': row_index, 'message': f'Unauthorized branch ID: {branch_id}'})
+                        continue
+
                 payload = {
                     'branch': branch_id,
                     'name': row.get('name', '').strip(),

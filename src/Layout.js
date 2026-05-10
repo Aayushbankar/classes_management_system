@@ -169,8 +169,9 @@ function Layout() {
               <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
             ))}
           </Form.Select>
-          <button className="btn btn-link p-0 fw-semibold" style={{ color: 'var(--danger)', fontSize: '0.85rem' }} onClick={handleLogout}>
-            🚪 Sign out
+          <button className="sidebar-logout" onClick={handleLogout}>
+            <span style={{ fontSize: '1.1rem' }}>🚪</span>
+            Sign out
           </button>
         </div>
       </aside>
@@ -243,11 +244,11 @@ function Layout() {
             ))}
           </div>
           <button
-            className="btn btn-link p-0 mt-3 fw-semibold"
-            style={{ color: 'var(--danger)', fontSize: '0.85rem' }}
+            className="sidebar-logout"
             onClick={handleLogout}
           >
-            🚪 Sign out
+            <span style={{ fontSize: '1.1rem' }}>🚪</span>
+            Sign out
           </button>
         </div>
       </div>
