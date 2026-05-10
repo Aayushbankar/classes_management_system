@@ -353,7 +353,13 @@ function FeesPage() {
                         <button
                           className="btn btn-sm rounded-pill px-3"
                           style={{ border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: "0.72rem" }}
-                          onClick={() => { setPrintPayment(p); setTimeout(() => window.print(), 100); }}
+                          onClick={() => { 
+                            setPrintPayment(p); 
+                            setTimeout(() => {
+                              window.print();
+                              setPrintPayment(null);
+                            }, 150); 
+                          }}
                           title="Print receipt"
                         >
                           Print
