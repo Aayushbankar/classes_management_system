@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.4;
+        }
+        .header {
+            background-color: #1e1b4b;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 12px;
+            color: #818cf8;
+            text-transform: uppercase;
+        }
+        .info-table {
+            width: 100%;
+            margin-top: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .info-table td {
+            vertical-align: top;
+        }
+        .section-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .item-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .item-table th {
+            background-color: #f8fafc;
+            padding: 10px;
+            text-align: left;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .item-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .total-box {
+            margin-top: 30px;
+            background-color: #1e1b4b;
+            color: #ffffff;
+            padding: 20px;
+            text-align: right;
+        }
+        .total-label {
+            font-size: 11px;
+            color: #818cf8;
+            text-transform: uppercase;
+        }
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .footer {
+            margin-top: 100px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        .signature-area {
+            text-align: right;
+            margin-top: -60px;
+        }
+        .notes {
+            font-size: 10px;
+            color: #94a3b8;
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EKLAVYA</h1>
+        <p>Educational Excellence</p>
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <td width="33%">
+                <div class="section-title">Issued To</div>
+                <strong>{{ student.name }}</strong><br>
+                Roll: {{ student.roll_number|default:"N/A" }}<br>
+                {{ student.standard }}
+            </td>
+            <td width="33%">
+                <div class="section-title">Payment Detail</div>
+                <strong>Receipt #{{ payment.id|stringformat:"06d" }}</strong><br>
+                Date: {{ payment.payment_date }}<br>
+                Method: {{ payment.payment_mode|upper }}
+            </td>
+            <td width="33%" style="text-align: right;">
+                <div class="section-title">Campus</div>
+                <strong>{{ student.branch.name|default:"Main Campus" }}</strong><br>
+                {{ student.batch_time|default:"General Batch" }}
+            </td>
+        </tr>
+    </table>
+
+    <table class="item-table">
+        <thead>
+            <tr>
+                <th width="60%">Description</th>
+                <th width="20%" style="text-align: center;">Mode</th>
+                <th width="20%" style="text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong>Academic Tuition Fee</strong><br>
+                    <span style="font-size: 10px; color: #64748b;">Reference: {{ payment.reference|default:"Auto-generated" }}</span>
+                </td>
+                <td style="text-align: center;">{{ payment.payment_mode|upper }}</td>
+                <td style="text-align: right;">₹{{ payment.amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total-box">
+        <div class="total-label">Total Amount Settled</div>
+        <div class="total-amount">₹{{ payment.amount }}</div>
+    </div>
+
+    <div class="footer">
+        <div class="notes">
+            <strong>Important Note:</strong><br>
+            This is a computer-generated receipt and does not require a physical signature. 
+            Fees once paid are non-refundable and non-transferable under Eklavya Academy policies.
+            Please retain this document for future academic correspondence.
+        </div>
+        
+        <div class="signature-area">
+            <div style="height: 40px;"></div>
+            <div style="border-top: 1px solid #1e293b; width: 200px; float: right;"></div>
+            <div style="clear: both;"></div>
+            <strong style="font-size: 12px;">HEAD OF FINANCE</strong><br>
+            <span style="font-size: 10px; color: #64748b;">Eklavya Academic Council</span>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; font-size: 9px; color: #cbd5e1;">
+        &copy; 2026 Eklavya Education Systems | www.eklavya.institute
+    </div>
+</body>
+</html>

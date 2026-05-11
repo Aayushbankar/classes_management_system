@@ -281,7 +281,14 @@ function FeeReceipt({ payment, student }) {
       
       <style>{`
         @media screen {
-          .fee-receipt { display: none !important; }
+          .fee-receipt { 
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+          }
         }
         @media print {
           .receipt-container {

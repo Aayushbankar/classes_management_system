@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchJson, fetchList, postJson, isAdmin } from '../api';
+import API_URL from '../config';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import FeeReceipt from '../components/FeeReceipt';
 import { exportToExcel, PAYMENT_COLS } from '../utils/export';
@@ -143,6 +144,34 @@ function FeesPage() {
 
   const [showFilters, setShowFilters] = useState(false);
   const [printPayment, setPrintPayment] = useState(null);
+  const [downloading, setDownloading] = useState(null);
+
+  const downloadReceipt = async (payment) => {
+    try {
+      setDownloading(payment.id);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(`${API_URL}/finance/payments/${payment.id}/receipt/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Receipt_${String(payment.id).padStart(6, '0')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e) {
+      alert('Error downloading receipt: ' + e.message);
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   const renderFilters = () => (
     <div className="filter-pane-inner">
@@ -358,11 +387,19 @@ function FeesPage() {
                             setTimeout(() => {
                               window.print();
                               setPrintPayment(null);
-                            }, 150); 
+                            }, 500); 
                           }}
-                          title="Print receipt"
+                          title="Browser Print"
                         >
                           Print
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-primary rounded-pill px-3 ms-1"
+                          style={{ fontSize: "0.72rem" }}
+                          onClick={() => downloadReceipt(p)}
+                          disabled={downloading === p.id}
+                        >
+                          {downloading === p.id ? '...' : 'PDF'}
                         </button>
                       </td>
                     </tr>

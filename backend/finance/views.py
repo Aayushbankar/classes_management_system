@@ -1,9 +1,13 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
 
 from .models import FeePayment
 from .serializers import FeePaymentSerializer
+from .utils import render_to_pdf
 from notifications.models import Notification
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 
 
 class FeePaymentViewSet(viewsets.ModelViewSet):
@@ -50,3 +54,20 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(student_id=student_id)
 
         return queryset
+
+    @action(detail=True, methods=['get'])
+    def receipt(self, request, pk=None):
+        payment = get_object_or_404(FeePayment, pk=pk)
+        
+        # Check permissions
+        user = request.user
+        if not (user.is_superuser or getattr(user, 'role', None) == 'owner'):
+            if hasattr(user, 'branch') and user.branch:
+                if payment.student.branch != user.branch:
+                    return HttpResponse("Unauthorized", status=403)
+        
+        context = {
+            'payment': payment,
+            'student': payment.student,
+        }
+        return render_to_pdf('finance/receipt_pdf.html', context)
