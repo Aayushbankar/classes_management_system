@@ -323,6 +323,13 @@ Record a new payment.
 }
 ```
 
+### GET `/finance/payments/{id}/receipt/`
+
+Generate and download a professional PDF receipt for a specific payment.
+
+**Response (200):**
+`application/pdf` binary stream.
+
 ---
 
 ## Reports & Dashboard

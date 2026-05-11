@@ -101,6 +101,8 @@ Branch filtering is automatically applied in the backend based on the authentica
 2. **Branch-level isolation** — Admin and Assistant users can only access data belonging to their assigned branch.
 3. **Computed fee fields** — `fee_left` is computed as `decided_fee - paid_fee` at the serializer level, not stored redundantly.
 4. **Timetable conflict detection** — The backend validates teacher schedule conflicts when creating/updating timetable slots.
+5. **PDF Generation (Cairo)** — Professional receipts are generated server-side using `xhtml2pdf`. This requires system-level Cairo libraries on the host or container.
+6. **Structured Logging** — All authentication events and financial transactions are logged to both stdout (for container monitoring) and local files.
 
 ---
 

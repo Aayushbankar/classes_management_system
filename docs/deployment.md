@@ -4,6 +4,25 @@ Instructions for deploying the Classes Management System to production environme
 
 ---
 
+## Deployment Platforms
+
+### Render (Single-Container)
+The most efficient way to deploy is using Render with the root `Dockerfile`. This will build both the React frontend and Django backend into a single container.
+
+1. **New → Web Service** on Render.
+2. Connect your GitHub repository.
+3. **Environment**: `Docker`.
+4. **Build Command**: (Automatic via Dockerfile).
+5. **Add Environment Variables**:
+   - `DATABASE_URL`: Your PostgreSQL URL.
+   - `SECRET_KEY`: A strong random string.
+   - `ALLOWED_HOSTS`: `your-app.onrender.com`.
+   - `REACT_APP_API_URL`: `/api`.
+
+> **Note**: Our Docker configuration automatically installs `libcairo2-dev` and `pkg-config`, which are required for the PDF receipt system.
+
+---
+
 ## Docker (Recommended)
 
 The project includes Docker configuration for containerized deployment.
@@ -86,6 +105,9 @@ Set these environment variables for production:
    python -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
+   
+   # IMPORTANT: Install Cairo for PDF receipts
+   sudo apt-get install build-essential libcairo2-dev pkg-config
    ```
 
 2. **Configure environment:**

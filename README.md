@@ -20,7 +20,8 @@ Built with React · Django REST Framework · JWT Authentication
 - **📊 Revenue Dashboard** — Power BI-style financial analytics with interactive charts, collection efficiency tracking, and payment mode breakdowns
 - **🎓 Student Management** — Full student lifecycle management with enrollment, fee tracking, progress bars, and detailed profiles
 - **👩‍🏫 Teacher Portal** — Faculty management with subject assignments, branch allocation, and contact directory
-- **💰 Fee & Finance** — Record payments, track pending fees, print receipts, and export transaction ledgers
+- **💰 Fee & Finance** — Record payments, track pending fees, and generate professional PDF receipts
+- **📄 PDF Receipt System** — Dual-mode system: high-performance browser printing + server-side PDF generation for 100% mobile compatibility
 - **🏢 Multi-Branch Support** — Operate across multiple branches with branch-level data isolation and filtering
 - **📅 Timetable & Scheduling** — Weekly timetable management with teacher conflict detection and batch/standard filtering
 - **🔔 Notifications** — In-app notification system with read/unread state and broadcast support
@@ -40,7 +41,8 @@ Built with React · Django REST Framework · JWT Authentication
 | **Backend** | Django 4.2, Django REST Framework, SimpleJWT |
 | **Database** | SQLite (dev) / PostgreSQL (prod) |
 | **API Docs** | OpenAPI 3.0 via drf-spectacular (Swagger UI) |
-| **Deployment** | Docker, Docker Compose |
+| **PDF Engine** | xhtml2pdf (ReportLab) |
+| **Deployment** | Docker, Docker Compose, Render (Single-Container) |
 
 ---
 

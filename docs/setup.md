@@ -12,6 +12,7 @@ Complete guide to setting up the Classes Management System for local development
 | [Node.js](https://nodejs.org/) | 18+ | Frontend runtime |
 | npm | 9+ | Package manager (bundled with Node.js) |
 | Git | Latest | Version control |
+| [Cairo](https://www.cairographics.org/download/) | — | System library for PDF generation (required for server-side receipts) |
 
 ---
 
@@ -53,6 +54,11 @@ source venv/bin/activate     # macOS / Linux
 
 # Install Python dependencies
 pip install -r requirements.txt
+
+# System Dependencies (Linux/macOS only)
+# Required for PDF receipt generation
+sudo apt-get install libcairo2-dev pkg-config  # Ubuntu/Debian
+brew install cairo                             # macOS
 
 # Create environment file
 copy .env.example .env       # Windows
@@ -207,6 +213,14 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 cd backend
 python manage.py migrate --run-syncdb
 ```
+
+### PDF Generation Errors (Cairo)
+
+If you see `ImportError: no library called "cairo"`, ensure you have installed the system-level Cairo libraries as described in the Prerequisites section.
+
+### Blank Receipts on Mobile
+
+If browser printing comes out blank on specific mobile devices, use the **"PDF"** download button in the transaction table. This uses server-side rendering which is 100% compatible with all mobile browsers.
 
 ### Backend Health Check
 
