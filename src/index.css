@@ -159,11 +159,19 @@
    GLOBAL THEME ADAPTATION
    ═══════════════════════════════════════ */
 body {
+  margin: 0;
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
 }
+
 
 /* Override Bootstrap Defaults to follow themes */
 .text-muted { color: var(--text-muted) !important; }
@@ -266,15 +274,8 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-body {
-  margin: 0;
-  font-family: var(--font-main);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
+
+
 
 h1,
 h2,
