@@ -159,35 +159,45 @@
    GLOBAL THEME ADAPTATION
    ═══════════════════════════════════════ */
 body {
-  margin: 0;
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-main);
-  line-height: 1.6;
-  overflow-x: hidden;
-  overflow-y: auto;
-  height: auto;
-  min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
-  -webkit-font-smoothing: antialiased;
 }
 
-
 /* Override Bootstrap Defaults to follow themes */
-.text-muted { color: var(--text-muted) !important; }
-.bg-light { background-color: var(--surface-muted) !important; }
-.bg-white { background-color: var(--surface) !important; }
-.border { border-color: var(--border) !important; }
-.text-dark { color: var(--text) !important; }
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.bg-light {
+  background-color: var(--surface-muted) !important;
+}
+
+.bg-white {
+  background-color: var(--surface) !important;
+}
+
+.border {
+  border-color: var(--border) !important;
+}
+
+.text-dark {
+  color: var(--text) !important;
+}
 
 /* Global Form Control Adaptation */
-input, select, textarea {
+input,
+select,
+textarea {
   background-color: var(--surface-muted);
   color: var(--text);
   border-color: var(--border);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   background-color: var(--surface);
   color: var(--text);
 }
@@ -274,7 +284,18 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
 
 h1,
@@ -556,7 +577,8 @@ a {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  min-width: 0; /* Ensures children can shrink */
+  min-width: 0;
+  /* Ensures children can shrink */
 }
 
 @media (min-width: 480px) {
@@ -1909,15 +1931,19 @@ select.input-premium {
 }
 
 @media screen {
-  .fee-receipt { display: none !important; }
+  .fee-receipt {
+    display: none !important;
+  }
 }
 
 /* ═══════════════════════════════════════
    PRINT OPTIMIZATION
    ═══════════════════════════════════════ */
 @media print {
+
   /* Ensure the body and html only take up the necessary space */
-  html, body {
+  html,
+  body {
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1926,7 +1952,7 @@ select.input-premium {
   }
 
   /* Hide EVERYTHING in the body except the fee receipt */
-  body > *:not(.fee-receipt) {
+  body>*:not(.fee-receipt) {
     display: none !important;
   }
 
@@ -1941,11 +1967,10 @@ select.input-premium {
     margin: 0 !important;
     padding: 0 !important;
   }
-  
+
   .receipt-card {
     box-shadow: none !important;
     border: 2px solid #1e1b4b !important;
     margin: 2rem auto !important;
   }
 }
-

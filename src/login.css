@@ -1,21 +1,10 @@
 /* Reset */
-.login-body {
+body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72) !important;
-  background-size: 400% 400% !important;
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
+  background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.login-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  perspective: 1000px;
 }
 
 
@@ -31,6 +20,17 @@
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Container */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  perspective: 1000px;
+  /* For 3D effects */
 }
 
 /* 🔥 Watermark (Logo Friendly) */
@@ -170,7 +170,7 @@ button:hover {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .login-body {
+  body {
     overflow: auto;
     height: auto;
     min-height: 100vh;
@@ -182,7 +182,6 @@ button:hover {
     padding: 2rem 1rem;
     padding-top: calc(2rem + env(safe-area-inset-top, 0));
   }
-
 
   .login-card {
     margin: 0;
@@ -206,7 +205,8 @@ button:hover {
   }
 
   .input-box input {
-    font-size: 16px; /* prevents iOS zoom on focus */
+    font-size: 16px;
+    /* prevents iOS zoom on focus */
   }
 
   .login-card button {

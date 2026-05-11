@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./login.css";
 import logo from "./logo.png";
 import { useNavigate } from "react-router-dom";
@@ -6,12 +6,6 @@ import API_URL from "./config";
 
 function Login() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    document.body.classList.add('login-body');
-    return () => document.body.classList.remove('login-body');
-  }, []);
-
 
   const [form, setForm] = useState({
     username: "",

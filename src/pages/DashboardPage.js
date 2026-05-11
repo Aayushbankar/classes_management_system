@@ -87,9 +87,9 @@ function DashboardPage() {
               <p className="small fw-bold m-0" style={{ letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{kpi.label}</p>
               <h3 className="stat-value m-0">{kpi.value}</h3>
             </div>
-            <div style={{ width: '100%', height: '40px', marginTop: '1rem' }}>
+            <div style={{ width: '100%', height: '40px', marginTop: '1rem', overflow: 'hidden' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={sparkData}>
+                <AreaChart data={sparkData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                   <Area 
                     type="monotone" 
                     dataKey="value" 
@@ -101,6 +101,7 @@ function DashboardPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+
           </div>
         ))}
       </div>
@@ -115,9 +116,9 @@ function DashboardPage() {
                 <option>Last 30 Days</option>
               </select>
             </div>
-            <div style={{ width: '100%', height: 'calc(100% - 60px)' }}>
+            <div style={{ width: '100%', height: 'calc(100% - 60px)', minWidth: 0 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={sparkData}>
+                <AreaChart data={sparkData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
@@ -141,6 +142,7 @@ function DashboardPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+
           </div>
         </div>
 
@@ -150,11 +152,11 @@ function DashboardPage() {
             <div className="d-flex flex-column align-items-center justify-content-center h-75">
               <div style={{ width: '100%', height: '200px', position: 'relative' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
+                  <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                     <Pie
                       data={pieData}
-                      innerRadius={60}
-                      outerRadius={80}
+                      innerRadius="60%"
+                      outerRadius="80%"
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -164,6 +166,7 @@ function DashboardPage() {
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
+
                 <div className="position-absolute top-50 start-50 translate-middle text-center">
                   <span className="fs-2 fw-bold">{collectionRate}%</span>
                   <p className="small text-muted m-0">Collected</p>
